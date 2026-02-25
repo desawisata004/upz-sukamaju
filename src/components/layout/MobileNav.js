@@ -7,7 +7,7 @@ import { ROLES, ROUTES } from '../../config/constants';
 const navItems = {
   [ROLES.WARGA]: [
     { path: ROUTES.HOME, icon: '🏠', label: 'Beranda' },
-    { path: '/scan', icon: '📷', label: 'Scan QR' },
+    { path: '/scan', icon: '📷', label: 'Scan' },
     { path: '/riwayat', icon: '📋', label: 'Riwayat' },
     { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
     { path: '/profil', icon: '👤', label: 'Profil' },
@@ -15,7 +15,7 @@ const navItems = {
   [ROLES.RT]: [
     { path: ROUTES.RT_DASHBOARD, icon: '📊', label: 'Dashboard' },
     { path: ROUTES.RT_SETORAN, icon: '💰', label: 'Setoran' },
-    { path: '/scan', icon: '📷', label: 'Scan QR' },
+    { path: '/scan', icon: '📷', label: 'Scan' },
     { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],
@@ -36,21 +36,26 @@ const MobileNav = () => {
   const role = userData?.role || ROLES.WARGA;
   const items = navItems[role] || navItems[ROLES.WARGA];
 
+  // Sembunyikan nav di halaman login
+  if (location.pathname === '/login') return null;
+
   return (
     <nav
       style={{
         position: 'fixed',
         bottom: 0,
-        left: '50%',
-        transform: 'translateX(-50%)',
+        left: 0,
+        right: 0,
         width: '100%',
-        maxWidth: 480,
+        maxWidth: '100%',
+        margin: '0 auto',
         background: '#fff',
         borderTop: '1px solid var(--abu-100)',
         display: 'flex',
         alignItems: 'stretch',
         zIndex: 200,
         boxShadow: '0 -4px 20px rgba(28,26,22,0.08)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
       }}
     >
       {items.map((item) => {
@@ -65,14 +70,15 @@ const MobileNav = () => {
               flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 3,
-              padding: '8px 4px',
+              gap: '2px',
+              padding: '8px 2px',
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               color: isActive ? 'var(--hijau)' : 'var(--abu-400)',
               transition: 'all var(--transition)',
               position: 'relative',
+              minWidth: 0,
             }}
           >
             {isActive && (
@@ -80,9 +86,8 @@ const MobileNav = () => {
                 style={{
                   position: 'absolute',
                   top: 0,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: 24,
+                  left: '20%',
+                  right: '20%',
                   height: 3,
                   background: 'var(--hijau)',
                   borderRadius: '0 0 3px 3px',
@@ -91,7 +96,7 @@ const MobileNav = () => {
             )}
             <span
               style={{
-                fontSize: '1.3rem',
+                fontSize: 'clamp(1.1rem, 5vw, 1.3rem)',
                 transform: isActive ? 'scale(1.1)' : 'scale(1)',
                 transition: 'transform var(--transition)',
               }}
@@ -100,9 +105,13 @@ const MobileNav = () => {
             </span>
             <span
               style={{
-                fontSize: '0.65rem',
+                fontSize: 'clamp(0.55rem, 2.5vw, 0.65rem)',
                 fontWeight: isActive ? 700 : 500,
-                letterSpacing: '0.01em',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                maxWidth: '100%',
+                padding: '0 2px',
               }}
             >
               {item.label}

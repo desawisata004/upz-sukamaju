@@ -6,7 +6,7 @@ const Card = ({
   style,
   onClick,
   shadow = 'md',
-  padding = '20px',
+  padding = null,
   className,
   ...props
 }) => {
@@ -20,31 +20,19 @@ const Card = ({
   const baseStyle = {
     background: '#fff',
     borderRadius: 'var(--radius-lg)',
-    padding,
+    padding: padding || 'clamp(16px, 4vw, 20px)',
     boxShadow: shadows[shadow],
     transition: 'all var(--transition)',
     cursor: onClick ? 'pointer' : 'default',
+    width: '100%',
     ...style,
   };
-
-  const hoverStyle = onClick
-    ? { transform: 'translateY(-1px)', boxShadow: 'var(--shadow-lg)' }
-    : {};
 
   return (
     <div
       style={baseStyle}
       className={className}
       onClick={onClick}
-      onMouseEnter={(e) => {
-        if (onClick) Object.assign(e.currentTarget.style, hoverStyle);
-      }}
-      onMouseLeave={(e) => {
-        if (onClick) {
-          e.currentTarget.style.transform = '';
-          e.currentTarget.style.boxShadow = shadows[shadow];
-        }
-      }}
       {...props}
     >
       {children}

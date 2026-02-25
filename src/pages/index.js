@@ -1,4 +1,4 @@
-// src/pages/index.js — Home page for Warga
+// src/pages/index.js
 import React, { useState } from 'react';
 import Header from '../components/layout/Header';
 import MobileNav from '../components/layout/MobileNav';
@@ -21,67 +21,57 @@ const KenclengCard = ({ k, onClick }) => {
     <Card
       onClick={onClick}
       style={{
-        background: isFull
-          ? 'linear-gradient(135deg, #f8f0d8, var(--kuning-pale))'
-          : '#fff',
+        background: isFull ? 'linear-gradient(135deg, #f8f0d8, var(--kuning-pale))' : '#fff',
         border: isFull ? '1px solid var(--kuning)33' : '1px solid transparent',
       }}
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
-        <div>
-          <h3 style={{ fontSize: '1rem', color: 'var(--hitam)', marginBottom: 2 }}>
+      <div className="flex justify-between items-start mb-2">
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <h3 style={{ 
+            fontSize: 'clamp(0.9rem, 3.5vw, 1rem)', 
+            color: 'var(--hitam)', 
+            marginBottom: 4,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap'
+          }}>
             {k.nama}
           </h3>
-          <span
-            style={{
-              fontSize: '0.7rem',
-              fontWeight: 600,
-              color: isFull ? 'var(--kuning)' : 'var(--hijau)',
-              background: isFull ? 'var(--kuning-pale)' : 'var(--hijau-pale)',
-              padding: '2px 8px',
-              borderRadius: 'var(--radius-full)',
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
+          <span className="badge" style={{
+            background: isFull ? 'var(--kuning-pale)' : 'var(--hijau-pale)',
+            color: isFull ? 'var(--kuning)' : 'var(--hijau)',
+          }}>
             {isFull ? '🎉 Tercapai' : k.status}
           </span>
         </div>
-        <div style={{ textAlign: 'right' }}>
-          <div style={{ fontSize: '1.25rem', fontWeight: 800, color: 'var(--hijau)', fontFamily: 'var(--font-display)' }}>
+        <div style={{ textAlign: 'right', marginLeft: 8 }}>
+          <div style={{ 
+            fontSize: 'clamp(1rem, 4vw, 1.25rem)', 
+            fontWeight: 800, 
+            color: 'var(--hijau)', 
+            fontFamily: 'var(--font-display)',
+            whiteSpace: 'nowrap'
+          }}>
             {formatRupiah(k.saldo)}
           </div>
-          <div style={{ fontSize: '0.75rem', color: 'var(--abu-400)', marginTop: 2 }}>
+          <div style={{ fontSize: 'clamp(0.65rem, 2.5vw, 0.75rem)', color: 'var(--abu-400)' }}>
             dari {formatRupiah(k.target)}
           </div>
         </div>
       </div>
 
-      {/* Progress bar */}
-      <div style={{ height: 8, background: 'var(--abu-100)', borderRadius: 4, overflow: 'hidden' }}>
-        <div
-          style={{
-            height: '100%',
-            width: `${progress}%`,
-            background: isFull
-              ? 'var(--kuning)'
-              : 'linear-gradient(90deg, var(--hijau), var(--hijau-muda))',
-            borderRadius: 4,
-            transition: 'width 1s cubic-bezier(0.4,0,0.2,1)',
-          }}
+      <div className="progress-bar">
+        <div 
+          className={`progress-fill ${isFull ? 'progress-fill-full' : ''}`}
+          style={{ width: `${progress}%` }} 
         />
       </div>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          marginTop: 6,
-          fontSize: '0.75rem',
-          color: 'var(--abu-400)',
-        }}
-      >
-        <span>Progress</span>
-        <span style={{ fontWeight: 700, color: isFull ? 'var(--kuning)' : 'var(--abu-500)' }}>
+      <div className="flex justify-between mt-1">
+        <span className="text-xs text-muted">Progress</span>
+        <span className="text-xs" style={{ 
+          fontWeight: 700, 
+          color: isFull ? 'var(--kuning)' : 'var(--abu-500)' 
+        }}>
           {progress}%
         </span>
       </div>
@@ -121,70 +111,39 @@ const HomePage = () => {
 
   return (
     <div className="app-layout">
-      {/* Hero Header */}
       <div
         style={{
           background: 'linear-gradient(160deg, var(--hijau) 0%, var(--coklat) 100%)',
-          padding: '28px 20px 48px',
+          padding: 'clamp(20px, 6vw, 28px) clamp(16px, 4vw, 20px) clamp(40px, 8vw, 48px)',
           position: 'relative',
           overflow: 'hidden',
         }}
       >
-        {/* Decorative bg */}
-        <div
-          style={{
-            position: 'absolute',
-            top: -30,
-            right: -30,
-            width: 150,
-            height: 150,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.06)',
-            pointerEvents: 'none',
-          }}
-        />
-        <div
-          style={{
-            position: 'absolute',
-            bottom: -20,
-            left: 20,
-            width: 100,
-            height: 100,
-            borderRadius: '50%',
-            background: 'rgba(255,255,255,0.04)',
-            pointerEvents: 'none',
-          }}
-        />
-
-        {/* Top row */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, position: 'relative' }}>
+        <div className="flex justify-between items-center mb-3">
           <div>
-            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.8rem', marginBottom: 2 }}>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.7)' }}>
               {RT_NAME}
             </p>
-            <h1
-              style={{
-                fontFamily: 'var(--font-display)',
-                color: '#fff',
-                fontSize: '1.4rem',
-                fontStyle: 'italic',
-              }}
-            >
+            <h1 style={{
+              fontFamily: 'var(--font-display)',
+              color: '#fff',
+              fontSize: 'clamp(1.2rem, 5vw, 1.4rem)',
+              fontStyle: 'italic',
+            }}>
               {APP_NAME}
             </h1>
           </div>
 
-          {/* Avatar */}
           <div
             style={{
-              width: 44,
-              height: 44,
+              width: 'clamp(40px, 10vw, 44px)',
+              height: 'clamp(40px, 10vw, 44px)',
               background: 'rgba(255,255,255,0.2)',
               borderRadius: '50%',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '1rem',
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)',
               fontWeight: 700,
               color: '#fff',
               cursor: 'pointer',
@@ -196,46 +155,35 @@ const HomePage = () => {
           </div>
         </div>
 
-        {/* Balance Card */}
         <div
           style={{
             background: 'rgba(255,255,255,0.15)',
             borderRadius: 'var(--radius-xl)',
-            padding: '20px',
+            padding: 'clamp(16px, 4vw, 20px)',
             border: '1px solid rgba(255,255,255,0.2)',
             backdropFilter: 'blur(10px)',
-            position: 'relative',
           }}
         >
-          <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', marginBottom: 4 }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.8)' }}>
             Total Tabungan
           </p>
-          <div
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '2.2rem',
-              color: '#fff',
-              fontWeight: 400,
-              letterSpacing: '-0.01em',
-            }}
-          >
+          <div style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(1.8rem, 8vw, 2.2rem)',
+            color: '#fff',
+            fontWeight: 400,
+            letterSpacing: '-0.01em',
+            wordBreak: 'break-word',
+          }}>
             {formatRupiah(totalSaldo)}
           </div>
-          <p style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.75rem', marginTop: 6 }}>
+          <p className="text-xs" style={{ color: 'rgba(255,255,255,0.6)' }}>
             {kenclengList.length} kencleng aktif
           </p>
         </div>
       </div>
 
-      {/* Page content — overlapping the header */}
-      <div
-        style={{
-          flex: 1,
-          padding: '0 16px',
-          marginTop: -20,
-          paddingBottom: 90,
-        }}
-      >
+      <div className="page-content" style={{ marginTop: '-clamp(16px, 4vw, 20px)' }}>
         {alert && (
           <Alert
             type={alert.type}
@@ -245,85 +193,62 @@ const HomePage = () => {
           />
         )}
 
-        {/* Quick actions */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: 12,
-            marginBottom: 20,
-          }}
-        >
+        <div className="grid-2 mb-3">
           {[
             { icon: '📷', label: 'Scan QR', path: '/scan', color: 'var(--hijau)' },
             { icon: '📋', label: 'Riwayat', path: '/riwayat', color: 'var(--coklat)' },
             { icon: '🏆', label: 'Peringkat', path: '/leaderboard', color: '#d4900d' },
-            { icon: '➕', label: 'Buat Kencleng', action: () => setShowCreate(true), color: 'var(--info)' },
+            { icon: '➕', label: 'Buat', action: () => setShowCreate(true), color: 'var(--info)' },
           ].map((item) => (
             <button
               key={item.label}
               onClick={item.action || (() => navigate(item.path))}
+              className="card card-clickable"
               style={{
-                background: '#fff',
-                border: 'none',
-                borderRadius: 'var(--radius-lg)',
-                padding: '16px',
+                padding: 'clamp(12px, 3vw, 16px)',
                 display: 'flex',
                 alignItems: 'center',
-                gap: 10,
-                cursor: 'pointer',
-                boxShadow: 'var(--shadow-md)',
-                transition: 'all var(--transition)',
-                fontFamily: 'var(--font-body)',
+                gap: 'clamp(6px, 2vw, 10px)',
               }}
-              onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-              onMouseLeave={(e) => { e.currentTarget.style.transform = ''; }}
             >
               <span
                 style={{
-                  width: 36,
-                  height: 36,
+                  width: 'clamp(32px, 8vw, 36px)',
+                  height: 'clamp(32px, 8vw, 36px)',
                   background: item.color + '18',
                   borderRadius: 'var(--radius-md)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: '1.2rem',
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)',
                   flexShrink: 0,
                 }}
               >
                 {item.icon}
               </span>
-              <span style={{ fontWeight: 600, fontSize: '0.875rem', color: 'var(--hitam)' }}>
+              <span style={{ 
+                fontWeight: 600, 
+                fontSize: 'clamp(0.75rem, 3vw, 0.875rem)',
+                color: 'var(--hitam)'
+              }}>
                 {item.label}
               </span>
             </button>
           ))}
         </div>
 
-        {/* Create kencleng form */}
         {showCreate && (
-          <Card style={{ marginBottom: 16, animation: 'slideUp 0.3s ease' }}>
-            <h3 style={{ marginBottom: 12, fontSize: '1rem' }}>Buat Kencleng Baru</h3>
+          <Card style={{ marginBottom: 16 }}>
+            <h3 className="mb-2">Buat Kencleng Baru</h3>
             <input
               type="text"
               value={namaKencleng}
               onChange={(e) => setNamaKencleng(e.target.value)}
               placeholder="Nama kencleng..."
-              style={{
-                width: '100%',
-                padding: '12px',
-                border: '1.5px solid var(--abu-200)',
-                borderRadius: 'var(--radius-md)',
-                fontSize: '1rem',
-                marginBottom: 12,
-                fontFamily: 'var(--font-body)',
-              }}
-              onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
+              className="mb-2"
             />
-            <div style={{ display: 'flex', gap: 8 }}>
-              <Button variant="ghost" onClick={() => setShowCreate(false)} style={{ flexShrink: 0 }}>
+            <div className="flex gap-2">
+              <Button variant="ghost" onClick={() => setShowCreate(false)}>
                 Batal
               </Button>
               <Button fullWidth onClick={handleCreate} loading={creating}>
@@ -333,39 +258,27 @@ const HomePage = () => {
           </Card>
         )}
 
-        {/* Kencleng list */}
         <div>
-          <h2
-            style={{
-              fontSize: '0.8rem',
-              fontWeight: 700,
-              color: 'var(--abu-700)',
-              marginBottom: 12,
-              textTransform: 'uppercase',
-              letterSpacing: '0.05em',
-            }}
-          >
+          <h2 className="text-xs text-muted mb-2" style={{ textTransform: 'uppercase' }}>
             Kencleng Saya
           </h2>
 
           {loading ? (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="flex flex-col gap-2">
               <SkeletonCard />
               <SkeletonCard />
             </div>
           ) : kenclengList.length === 0 ? (
             <div className="empty-state">
               <div className="empty-icon">🪣</div>
-              <p style={{ fontWeight: 600, color: 'var(--abu-700)' }}>Belum ada kencleng</p>
-              <p style={{ fontSize: '0.875rem', marginBottom: 16 }}>
-                Buat kencleng pertama Anda untuk mulai menabung
-              </p>
+              <p style={{ fontWeight: 600 }}>Belum ada kencleng</p>
+              <p className="text-sm mb-3">Buat kencleng pertama Anda</p>
               <Button onClick={() => setShowCreate(true)} icon="➕">
                 Buat Kencleng
               </Button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div className="flex flex-col gap-2">
               {kenclengList.map((k) => (
                 <KenclengCard
                   key={k.id}

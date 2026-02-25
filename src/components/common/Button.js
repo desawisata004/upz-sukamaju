@@ -29,17 +29,11 @@ const variants = {
   },
 };
 
-const sizes = {
-  sm: { padding: '6px 14px', fontSize: '0.8rem', height: '32px' },
-  md: { padding: '10px 20px', fontSize: '0.9rem', height: '42px' },
-  lg: { padding: '14px 28px', fontSize: '1rem', height: '52px' },
-};
-
 const Button = ({
   children,
   variant = 'primary',
   size = 'md',
-  fullWidth = false,
+  fullWidth = true,
   loading = false,
   disabled = false,
   onClick,
@@ -49,13 +43,30 @@ const Button = ({
   ...props
 }) => {
   const v = variants[variant] || variants.primary;
-  const s = sizes[size] || sizes.md;
+
+  const sizeStyles = {
+    sm: {
+      padding: 'clamp(4px, 2vw, 6px) clamp(10px, 3vw, 14px)',
+      fontSize: 'clamp(0.7rem, 2.5vw, 0.8rem)',
+      minHeight: 'clamp(28px, 8vw, 32px)',
+    },
+    md: {
+      padding: 'clamp(8px, 2.5vw, 10px) clamp(16px, 4vw, 20px)',
+      fontSize: 'clamp(0.8rem, 3vw, 0.9rem)',
+      minHeight: 'clamp(38px, 10vw, 42px)',
+    },
+    lg: {
+      padding: 'clamp(12px, 3vw, 14px) clamp(20px, 5vw, 28px)',
+      fontSize: 'clamp(0.9rem, 3.5vw, 1rem)',
+      minHeight: 'clamp(48px, 12vw, 52px)',
+    },
+  };
 
   const baseStyle = {
     display: 'inline-flex',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: '8px',
+    gap: 'clamp(4px, 2vw, 8px)',
     borderRadius: 'var(--radius-full)',
     fontFamily: 'var(--font-body)',
     fontWeight: 600,
@@ -64,8 +75,9 @@ const Button = ({
     transition: 'all var(--transition)',
     width: fullWidth ? '100%' : 'auto',
     letterSpacing: '0.01em',
+    whiteSpace: 'nowrap',
     ...v,
-    ...s,
+    ...sizeStyles[size],
     ...extStyle,
   };
 
@@ -82,20 +94,21 @@ const Button = ({
           <span
             style={{
               display: 'inline-block',
-              width: '14px',
-              height: '14px',
+              width: 'clamp(12px, 3vw, 14px)',
+              height: 'clamp(12px, 3vw, 14px)',
               border: '2px solid currentColor',
               borderTopColor: 'transparent',
               borderRadius: '50%',
               animation: 'spin 0.6s linear infinite',
             }}
           />
-          Memproses...
+          <span className="hide-mobile">Memproses...</span>
+          <span className="hide-desktop">...</span>
         </>
       ) : (
         <>
           {icon && <span>{icon}</span>}
-          {children}
+          <span className={fullWidth ? '' : 'hide-mobile'}>{children}</span>
         </>
       )}
     </button>
