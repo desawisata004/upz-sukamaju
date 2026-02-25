@@ -209,3 +209,45 @@ export const getLeaderboard = async () => {
     return [];
   }
 };
+// Tambahkan fungsi ini di kenclengService.js
+
+export const getSetoranByDate = async (kenclengId, startDate, endDate) => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('kenclengId', '==', kenclengId),
+      where('createdAt', '>=', startDate),
+      where('createdAt', '<=', endDate),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error getting setoran by date:', error);
+    return [];
+  }
+};
+
+export const getTotalSetoranHariIni = async () => {
+  if (!db) return 0;
+  try {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('createdAt', '>=', today),
+      where('createdAt', '<', tomorrow),
+      where('status', '==', STATUS_SETORAN.DITERIMA)
+    );
+    
+    const snap = await getDocs(q);
+    return snap.docs.reduce((total, doc) => total + (doc.data().nominal || 0), 0);
+  } catch (error) {
+    console.error('Error getting total setoran hari ini:', error);
+    return 0;
+  }
+};

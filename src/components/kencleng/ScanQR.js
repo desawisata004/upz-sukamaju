@@ -9,6 +9,8 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
   const [permissionDenied, setPermissionDenied] = useState(false);
+  const [cameras, setCameras] = useState([]);
+  const [selectedCamera, setSelectedCamera] = useState('');
   const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
@@ -18,20 +20,42 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
 
     try {
       html5QrCodeRef.current = new Html5Qrcode('qr-reader');
-      await html5QrCodeRef.current.start(
-        { facingMode: 'environment' },
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          const data = validateQRData(decodedText);
-          if (data) {
-            stopScanner();
-            onScanSuccess(data);
-          } else {
-            setError('QR Code tidak valid. Pastikan QR dari Kencleng Digital.');
+      
+      // Get cameras
+      const devices = await Html5Qrcode.getCameras();
+      if (devices && devices.length > 0) {
+        setCameras(devices);
+        const backCamera = devices.find(d => 
+          d.label.toLowerCase().includes('back') || 
+          d.label.toLowerCase().includes('environment')
+        );
+        const cameraId = backCamera ? backCamera.id : devices[0].id;
+        setSelectedCamera(cameraId);
+
+        await html5QrCodeRef.current.start(
+          cameraId,
+          { 
+            fps: 10, 
+            qrbox: { width: 250, height: 250 },
+            aspectRatio: 1
+          },
+          (decodedText) => {
+            const data = validateQRData(decodedText);
+            if (data) {
+              stopScanner();
+              onScanSuccess(data);
+            } else {
+              setError('QR Code tidak valid. Pastikan QR dari Kencleng Digital.');
+            }
+          },
+          (errorMessage) => {
+            // Ignore scan errors
+            console.debug('Scan error:', errorMessage);
           }
-        },
-        () => {}
-      );
+        );
+      } else {
+        throw new Error('Tidak ada kamera ditemukan');
+      }
     } catch (err) {
       setScanning(false);
       if (err.toString().includes('permission')) {
@@ -47,15 +71,46 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
     if (html5QrCodeRef.current) {
       try {
         await html5QrCodeRef.current.stop();
-        html5QrCodeRef.current.clear();
-      } catch (e) {}
+        await html5QrCodeRef.current.clear();
+      } catch (e) {
+        console.debug('Stop scanner error:', e);
+      }
       html5QrCodeRef.current = null;
     }
     setScanning(false);
   };
 
+  const switchCamera = async (cameraId) => {
+    if (!html5QrCodeRef.current || !scanning) return;
+    
+    try {
+      await html5QrCodeRef.current.stop();
+      await html5QrCodeRef.current.start(
+        cameraId,
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          const data = validateQRData(decodedText);
+          if (data) {
+            stopScanner();
+            onScanSuccess(data);
+          } else {
+            setError('QR Code tidak valid.');
+          }
+        },
+        () => {}
+      );
+      setSelectedCamera(cameraId);
+    } catch (err) {
+      setError('Gagal ganti kamera: ' + err.toString());
+    }
+  };
+
   useEffect(() => {
-    return () => { stopScanner(); };
+    return () => { 
+      if (html5QrCodeRef.current) {
+        stopScanner();
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -149,6 +204,30 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
           </div>
         )}
       </div>
+
+      {/* Camera selector */}
+      {scanning && cameras.length > 1 && (
+        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+          {cameras.map(camera => (
+            <button
+              key={camera.id}
+              onClick={() => switchCamera(camera.id)}
+              style={{
+                padding: '6px 12px',
+                borderRadius: 'var(--radius-full)',
+                border: '1.5px solid',
+                borderColor: selectedCamera === camera.id ? 'var(--hijau)' : 'var(--abu-200)',
+                background: selectedCamera === camera.id ? 'var(--hijau-pale)' : '#fff',
+                color: selectedCamera === camera.id ? 'var(--hijau)' : 'var(--abu-700)',
+                fontSize: '0.8rem',
+                cursor: 'pointer',
+              }}
+            >
+              {camera.label.includes('back') ? '📷 Belakang' : '📱 Depan'}
+            </button>
+          ))}
+        </div>
+      )}
 
       {error && <Alert type="error" message={error} onClose={() => setError('')} />}
       {permissionDenied && (

@@ -21,7 +21,10 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async () => {
-    const num = Number(nominal.replace(/[^0-9]/g, ''));
+    // Hapus karakter non-digit
+    const numericString = nominal.replace(/[^0-9]/g, '');
+    const num = parseInt(numericString, 10);
+    
     const validation = validateNominal(num);
     if (!validation.valid) {
       setAlert({ type: 'error', message: validation.message });
@@ -34,20 +37,22 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
         kenclengId: kencleng.id,
         userId: kencleng.userId,
         nominal: num,
-        catatan,
-        inputBy: userData?.uid || 'unknown',
+        catatan: catatan.trim(),
+        inputBy: userData?.uid || 'rt',
       });
-      setAlert({ type: 'success', message: 'Setoran berhasil dicatat! Menunggu konfirmasi.' });
-      setTimeout(() => onSuccess && onSuccess(), 1500);
+      setAlert({ type: 'success', message: '✅ Setoran berhasil dicatat! Menunggu konfirmasi.' });
+      setTimeout(() => {
+        if (onSuccess) onSuccess();
+      }, 1500);
     } catch (err) {
-      setAlert({ type: 'error', message: 'Gagal mencatat setoran: ' + err.message });
+      setAlert({ type: 'error', message: '❌ Gagal mencatat setoran: ' + err.message });
     } finally {
       setLoading(false);
     }
   };
 
   const displayNominal = nominal
-    ? formatRupiah(Number(nominal.replace(/[^0-9]/g, '')))
+    ? formatRupiah(parseInt(nominal.replace(/[^0-9]/g, '') || '0', 10))
     : 'Rp 0';
 
   return (
@@ -55,7 +60,7 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
       {/* Kencleng Info */}
       <Card
         style={{
-          background: 'var(--hijau)',
+          background: 'linear-gradient(135deg, var(--hijau), var(--hijau-muda))',
           color: '#fff',
           borderRadius: 'var(--radius-lg)',
         }}
@@ -135,8 +140,8 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
                 padding: '6px 12px',
                 borderRadius: 'var(--radius-full)',
                 border: '1.5px solid var(--abu-200)',
-                background: Number(nominal) === p ? 'var(--hijau)' : '#fff',
-                color: Number(nominal) === p ? '#fff' : 'var(--abu-700)',
+                background: parseInt(nominal) === p ? 'var(--hijau)' : '#fff',
+                color: parseInt(nominal) === p ? '#fff' : 'var(--abu-700)',
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 cursor: 'pointer',
@@ -199,7 +204,13 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
             Batal
           </Button>
         )}
-        <Button fullWidth onClick={handleSubmit} loading={loading} icon="💰">
+        <Button 
+          fullWidth 
+          onClick={handleSubmit} 
+          loading={loading} 
+          icon="💰"
+          disabled={!nominal}
+        >
           Catat Setoran
         </Button>
       </div>
