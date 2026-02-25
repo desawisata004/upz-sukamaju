@@ -1,4 +1,3 @@
-// src/services/auth.js
 import {
   signInWithEmailAndPassword,
   signOut,

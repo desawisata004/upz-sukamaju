@@ -1,5 +1,3 @@
-// src/utils/formatter.js
-
 export const formatRupiah = (amount) => {
   if (!amount && amount !== 0) return 'Rp 0';
   return new Intl.NumberFormat('id-ID', {

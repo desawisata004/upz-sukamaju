@@ -1,4 +1,3 @@
-// src/components/kencleng/Leaderboard.js
 import React, { useState, useEffect } from 'react';
 import { getLeaderboard } from '../../services/kenclengService';
 import { formatRupiah, formatProgress, initials } from '../../utils/formatter';

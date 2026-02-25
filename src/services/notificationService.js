@@ -1,4 +1,3 @@
-// src/services/notificationService.js
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import { COLLECTIONS } from '../config/constants';

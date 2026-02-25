@@ -1,4 +1,3 @@
-// src/components/common/Alert.js
 import React, { useEffect } from 'react';
 
 const types = {

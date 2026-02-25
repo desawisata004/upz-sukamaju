@@ -1,4 +1,3 @@
-// src/components/kencleng/RiwayatSetoran.js
 import React from 'react';
 import { formatRupiah, formatTimeAgo } from '../../utils/formatter';
 import { STATUS_SETORAN } from '../../config/constants';

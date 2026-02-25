@@ -1,4 +1,3 @@
-// src/components/kencleng/InputSetoran.js
 import React, { useState } from 'react';
 import { createSetoran } from '../../services/kenclengService';
 import { validateNominal } from '../../utils/validator';
@@ -21,7 +20,6 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
   };
 
   const handleSubmit = async () => {
-    // Hapus karakter non-digit
     const numericString = nominal.replace(/[^0-9]/g, '');
     const num = parseInt(numericString, 10);
     
@@ -56,13 +54,11 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
     : 'Rp 0';
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, animation: 'slideUp 0.3s ease' }}>
-      {/* Kencleng Info */}
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <Card
         style={{
           background: 'linear-gradient(135deg, var(--hijau), var(--hijau-muda))',
           color: '#fff',
-          borderRadius: 'var(--radius-lg)',
         }}
         shadow="none"
       >
@@ -73,23 +69,18 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
         </div>
       </Card>
 
-      {/* Nominal Input */}
       <div>
-        <label
-          style={{
-            display: 'block',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            color: 'var(--abu-500)',
-            marginBottom: 8,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <label style={{
+          display: 'block',
+          fontSize: '0.8rem',
+          fontWeight: 600,
+          color: 'var(--abu-500)',
+          marginBottom: 8,
+          textTransform: 'uppercase',
+        }}>
           Nominal Setoran
         </label>
 
-        {/* Large display */}
         <div
           style={{
             fontSize: '2rem',
@@ -103,7 +94,6 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
           {displayNominal}
         </div>
 
-        {/* Input field */}
         <input
           type="number"
           value={nominal}
@@ -115,23 +105,10 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
             border: '1.5px solid var(--abu-200)',
             borderRadius: 'var(--radius-md)',
             fontSize: '1rem',
-            background: '#fff',
-            color: 'var(--hitam)',
-            transition: 'border-color var(--transition)',
           }}
-          onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
-          onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
         />
 
-        {/* Preset buttons */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            gap: 8,
-            marginTop: 10,
-          }}
-        >
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 10 }}>
           {NOMINAL_PRESETS.map((p) => (
             <button
               key={p}
@@ -145,8 +122,6 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
                 fontSize: '0.8rem',
                 fontWeight: 600,
                 cursor: 'pointer',
-                transition: 'all var(--transition)',
-                fontFamily: 'var(--font-body)',
               }}
             >
               {formatRupiah(p)}
@@ -155,19 +130,15 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
         </div>
       </div>
 
-      {/* Catatan */}
       <div>
-        <label
-          style={{
-            display: 'block',
-            fontSize: '0.8rem',
-            fontWeight: 600,
-            color: 'var(--abu-500)',
-            marginBottom: 8,
-            letterSpacing: '0.05em',
-            textTransform: 'uppercase',
-          }}
-        >
+        <label style={{
+          display: 'block',
+          fontSize: '0.8rem',
+          fontWeight: 600,
+          color: 'var(--abu-500)',
+          marginBottom: 8,
+          textTransform: 'uppercase',
+        }}>
           Catatan (opsional)
         </label>
         <input
@@ -181,12 +152,7 @@ const InputSetoran = ({ kencleng, onSuccess, onCancel }) => {
             border: '1.5px solid var(--abu-200)',
             borderRadius: 'var(--radius-md)',
             fontSize: '1rem',
-            background: '#fff',
-            color: 'var(--hitam)',
-            transition: 'border-color var(--transition)',
           }}
-          onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
-          onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
         />
       </div>
 

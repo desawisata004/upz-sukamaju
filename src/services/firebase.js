@@ -1,10 +1,8 @@
-// src/services/firebase.js
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getMessaging, isSupported } from 'firebase/messaging';
 
-// Firebase configuration
 const firebaseConfig = {
   apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyCKezmnqYrzPfO-MB2ur2x0aIdx8iYJWMM",
   authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "upz-sukamaju.firebaseapp.com",
@@ -15,7 +13,6 @@ const firebaseConfig = {
   measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID || ""
 };
 
-// Inisialisasi Firebase
 let app = null;
 let auth = null;
 let db = null;

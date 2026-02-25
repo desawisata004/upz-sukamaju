@@ -1,5 +1,3 @@
-// src/config/constants.js
-
 export const APP_NAME = process.env.REACT_APP_NAME || 'Kencleng Digital';
 export const RT_NAME = process.env.REACT_APP_RT_NAME || 'RT 05/RW 03';
 

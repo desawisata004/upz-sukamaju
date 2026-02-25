@@ -1,4 +1,3 @@
-// src/components/layout/MobileNav.js
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
@@ -36,7 +35,6 @@ const MobileNav = () => {
   const role = userData?.role || ROLES.WARGA;
   const items = navItems[role] || navItems[ROLES.WARGA];
 
-  // Sembunyikan nav di halaman login
   if (location.pathname === '/login') return null;
 
   return (
@@ -98,7 +96,6 @@ const MobileNav = () => {
               style={{
                 fontSize: 'clamp(1.1rem, 5vw, 1.3rem)',
                 transform: isActive ? 'scale(1.1)' : 'scale(1)',
-                transition: 'transform var(--transition)',
               }}
             >
               {item.icon}
@@ -111,7 +108,6 @@ const MobileNav = () => {
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 maxWidth: '100%',
-                padding: '0 2px',
               }}
             >
               {item.label}

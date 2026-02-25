@@ -1,4 +1,3 @@
-// src/components/layout/Header.js
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { RT_NAME, APP_NAME } from '../../config/constants';
@@ -7,7 +6,6 @@ const Header = ({ title, showBack, rightAction, subtitle }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Sembunyikan header di halaman login
   if (location.pathname === '/login') return null;
 
   return (
@@ -41,7 +39,6 @@ const Header = ({ title, showBack, rightAction, subtitle }) => {
             justifyContent: 'center',
             fontSize: 'clamp(0.9rem, 4vw, 1rem)',
             flexShrink: 0,
-            transition: 'all var(--transition)',
           }}
         >
           ←
@@ -57,7 +54,6 @@ const Header = ({ title, showBack, rightAction, subtitle }) => {
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
-            lineHeight: 1.2,
           }}
         >
           {title || APP_NAME}
@@ -77,10 +73,7 @@ const Header = ({ title, showBack, rightAction, subtitle }) => {
       </div>
 
       {rightAction && (
-        <div style={{ 
-          flexShrink: 0,
-          fontSize: 'clamp(0.7rem, 3vw, 0.8rem)',
-        }}>
+        <div style={{ flexShrink: 0 }}>
           {rightAction}
         </div>
       )}

@@ -1,4 +1,3 @@
-// src/components/layout/Footer.js
 import React from 'react';
 import { APP_NAME, RT_NAME } from '../../config/constants';
 

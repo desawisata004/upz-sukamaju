@@ -1,4 +1,3 @@
-// src/hooks/useKencleng.js
 import { useState, useEffect } from 'react';
 import { getKenclengByUser } from '../services/kenclengService';
 import { STATUS_KENCLENG } from '../config/constants';

@@ -1,4 +1,3 @@
-// src/utils/qrGenerator.js
 import QRCode from 'qrcode';
 
 export const generateQRData = (kenclengId, userId, nama) => {

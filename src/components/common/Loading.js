@@ -1,4 +1,3 @@
-// src/components/common/Loading.js
 import React from 'react';
 
 export const Spinner = ({ size = 32, color = 'var(--hijau)' }) => (

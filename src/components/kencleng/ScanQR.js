@@ -1,4 +1,3 @@
-// src/components/kencleng/ScanQR.js
 import React, { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { validateQRData } from '../../utils/validator';
@@ -9,9 +8,6 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
   const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
   const [permissionDenied, setPermissionDenied] = useState(false);
-  const [cameras, setCameras] = useState([]);
-  const [selectedCamera, setSelectedCamera] = useState('');
-  const scannerRef = useRef(null);
   const html5QrCodeRef = useRef(null);
 
   const startScanner = async () => {
@@ -21,41 +17,24 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
     try {
       html5QrCodeRef.current = new Html5Qrcode('qr-reader');
       
-      // Get cameras
-      const devices = await Html5Qrcode.getCameras();
-      if (devices && devices.length > 0) {
-        setCameras(devices);
-        const backCamera = devices.find(d => 
-          d.label.toLowerCase().includes('back') || 
-          d.label.toLowerCase().includes('environment')
-        );
-        const cameraId = backCamera ? backCamera.id : devices[0].id;
-        setSelectedCamera(cameraId);
-
-        await html5QrCodeRef.current.start(
-          cameraId,
-          { 
-            fps: 10, 
-            qrbox: { width: 250, height: 250 },
-            aspectRatio: 1
-          },
-          (decodedText) => {
-            const data = validateQRData(decodedText);
-            if (data) {
-              stopScanner();
-              onScanSuccess(data);
-            } else {
-              setError('QR Code tidak valid. Pastikan QR dari Kencleng Digital.');
-            }
-          },
-          (errorMessage) => {
-            // Ignore scan errors
-            console.debug('Scan error:', errorMessage);
+      await html5QrCodeRef.current.start(
+        { facingMode: 'environment' },
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1
+        },
+        (decodedText) => {
+          const data = validateQRData(decodedText);
+          if (data) {
+            stopScanner();
+            onScanSuccess(data);
+          } else {
+            setError('QR Code tidak valid. Pastikan QR dari Kencleng Digital.');
           }
-        );
-      } else {
-        throw new Error('Tidak ada kamera ditemukan');
-      }
+        },
+        () => {}
+      );
     } catch (err) {
       setScanning(false);
       if (err.toString().includes('permission')) {
@@ -72,37 +51,10 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
       try {
         await html5QrCodeRef.current.stop();
         await html5QrCodeRef.current.clear();
-      } catch (e) {
-        console.debug('Stop scanner error:', e);
-      }
+      } catch (e) {}
       html5QrCodeRef.current = null;
     }
     setScanning(false);
-  };
-
-  const switchCamera = async (cameraId) => {
-    if (!html5QrCodeRef.current || !scanning) return;
-    
-    try {
-      await html5QrCodeRef.current.stop();
-      await html5QrCodeRef.current.start(
-        cameraId,
-        { fps: 10, qrbox: { width: 250, height: 250 } },
-        (decodedText) => {
-          const data = validateQRData(decodedText);
-          if (data) {
-            stopScanner();
-            onScanSuccess(data);
-          } else {
-            setError('QR Code tidak valid.');
-          }
-        },
-        () => {}
-      );
-      setSelectedCamera(cameraId);
-    } catch (err) {
-      setError('Gagal ganti kamera: ' + err.toString());
-    }
   };
 
   useEffect(() => {
@@ -111,11 +63,10 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
         stopScanner();
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 16, animation: 'fadeIn 0.3s ease' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
       <div
         style={{
           background: 'var(--hitam)',
@@ -136,10 +87,8 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
           </div>
         )}
 
-        {/* Scanner container */}
         <div
           id="qr-reader"
-          ref={scannerRef}
           style={{
             width: '100%',
             height: '100%',
@@ -169,7 +118,6 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
                 position: 'relative',
               }}
             >
-              {/* Corner indicators */}
               {['topLeft','topRight','bottomLeft','bottomRight'].map((pos) => (
                 <span
                   key={pos}
@@ -180,15 +128,14 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
                     borderColor: 'var(--hijau-muda)',
                     borderStyle: 'solid',
                     borderWidth: 0,
-                    ...(pos === 'topLeft' ? { top: -2, left: -2, borderTopWidth: 3, borderLeftWidth: 3, borderRadius: '4px 0 0 0' } : {}),
-                    ...(pos === 'topRight' ? { top: -2, right: -2, borderTopWidth: 3, borderRightWidth: 3, borderRadius: '0 4px 0 0' } : {}),
-                    ...(pos === 'bottomLeft' ? { bottom: -2, left: -2, borderBottomWidth: 3, borderLeftWidth: 3, borderRadius: '0 0 0 4px' } : {}),
-                    ...(pos === 'bottomRight' ? { bottom: -2, right: -2, borderBottomWidth: 3, borderRightWidth: 3, borderRadius: '0 0 4px 0' } : {}),
+                    ...(pos === 'topLeft' ? { top: -2, left: -2, borderTopWidth: 3, borderLeftWidth: 3 } : {}),
+                    ...(pos === 'topRight' ? { top: -2, right: -2, borderTopWidth: 3, borderRightWidth: 3 } : {}),
+                    ...(pos === 'bottomLeft' ? { bottom: -2, left: -2, borderBottomWidth: 3, borderLeftWidth: 3 } : {}),
+                    ...(pos === 'bottomRight' ? { bottom: -2, right: -2, borderBottomWidth: 3, borderRightWidth: 3 } : {}),
                   }}
                 />
               ))}
 
-              {/* Scan line animation */}
               <div
                 style={{
                   position: 'absolute',
@@ -204,30 +151,6 @@ const ScanQR = ({ onScanSuccess, onCancel }) => {
           </div>
         )}
       </div>
-
-      {/* Camera selector */}
-      {scanning && cameras.length > 1 && (
-        <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
-          {cameras.map(camera => (
-            <button
-              key={camera.id}
-              onClick={() => switchCamera(camera.id)}
-              style={{
-                padding: '6px 12px',
-                borderRadius: 'var(--radius-full)',
-                border: '1.5px solid',
-                borderColor: selectedCamera === camera.id ? 'var(--hijau)' : 'var(--abu-200)',
-                background: selectedCamera === camera.id ? 'var(--hijau-pale)' : '#fff',
-                color: selectedCamera === camera.id ? 'var(--hijau)' : 'var(--abu-700)',
-                fontSize: '0.8rem',
-                cursor: 'pointer',
-              }}
-            >
-              {camera.label.includes('back') ? '📷 Belakang' : '📱 Depan'}
-            </button>
-          ))}
-        </div>
-      )}
 
       {error && <Alert type="error" message={error} onClose={() => setError('')} />}
       {permissionDenied && (

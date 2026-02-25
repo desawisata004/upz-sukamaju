@@ -1,4 +1,3 @@
-// src/components/common/Button.js
 import React from 'react';
 
 const variants = {
@@ -102,13 +101,12 @@ const Button = ({
               animation: 'spin 0.6s linear infinite',
             }}
           />
-          <span className="hide-mobile">Memproses...</span>
-          <span className="hide-desktop">...</span>
+          <span>Memproses...</span>
         </>
       ) : (
         <>
           {icon && <span>{icon}</span>}
-          <span className={fullWidth ? '' : 'hide-mobile'}>{children}</span>
+          {children}
         </>
       )}
     </button>
