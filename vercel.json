@@ -13,12 +13,13 @@
     }
   ],
   "env": {
-    "REACT_APP_FIREBASE_API_KEY": "@react-app-firebase-api-key",
-    "REACT_APP_FIREBASE_AUTH_DOMAIN": "@react-app-firebase-auth-domain",
-    "REACT_APP_FIREBASE_PROJECT_ID": "@react-app-firebase-project-id",
-    "REACT_APP_FIREBASE_STORAGE_BUCKET": "@react-app-firebase-storage-bucket",
-    "REACT_APP_FIREBASE_MESSAGING_SENDER_ID": "@react-app-firebase-messaging-sender-id",
-    "REACT_APP_FIREBASE_APP_ID": "@react-app-firebase-app-id",
-    "REACT_APP_FIREBASE_MEASUREMENT_ID": "@react-app-firebase-measurement-id"
+    "REACT_APP_FIREBASE_API_KEY": "AIzaSyCKezmnqYrzPfO-MB2ur2x0aIdx8iYJWMM",
+    "REACT_APP_FIREBASE_AUTH_DOMAIN": "upz-sukamaju.firebaseapp.com",
+    "REACT_APP_FIREBASE_PROJECT_ID": "upz-sukamaju",
+    "REACT_APP_FIREBASE_STORAGE_BUCKET": "upz-sukamaju.firebasestorage.app",
+    "REACT_APP_FIREBASE_MESSAGING_SENDER_ID": "511069915901",
+    "REACT_APP_FIREBASE_APP_ID": "1:511069915901:web:c8ec6af8961a75dd878c94",
+    "REACT_APP_NAME": "Kencleng Digital",
+    "REACT_APP_RT_NAME": "RT 05/RW 03"
   }
 }
