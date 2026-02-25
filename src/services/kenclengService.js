@@ -247,3 +247,142 @@ export const getTotalSetoranHariIni = async () => {
     return 0;
   }
 };
+
+// ==================== ANALYTICS ====================
+
+export const getSetoranByPeriod = async (bulan, tahun) => {
+  if (!db) return [];
+  try {
+    const start = new Date(tahun, bulan - 1, 1);
+    const end = new Date(tahun, bulan, 1);
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('createdAt', '>=', start),
+      where('createdAt', '<', end),
+      where('status', '==', STATUS_SETORAN.DITERIMA),
+      orderBy('createdAt', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getTrendBulanan = async (nBulan = 6) => {
+  if (!db) return [];
+  try {
+    const now = new Date();
+    const results = [];
+    for (let i = nBulan - 1; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const bulan = d.getMonth() + 1;
+      const tahun = d.getFullYear();
+      const start = new Date(tahun, bulan - 1, 1);
+      const end = new Date(tahun, bulan, 1);
+      const q = query(
+        collection(db, COLLECTIONS.SETORAN),
+        where('createdAt', '>=', start),
+        where('createdAt', '<', end),
+        where('status', '==', STATUS_SETORAN.DITERIMA)
+      );
+      const snap = await getDocs(q);
+      const total = snap.docs.reduce((acc, doc) => acc + (doc.data().nominal || 0), 0);
+      const count = snap.docs.length;
+      results.push({
+        bulan: d.toLocaleDateString('id-ID', { month: 'short', year: '2-digit' }),
+        total,
+        count,
+        raw: d,
+      });
+    }
+    return results;
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getSetoranStats = async () => {
+  if (!db) return { hariIni: 0, mingguIni: 0, bulanIni: 0, pending: 0, totalDiterima: 0 };
+  try {
+    const now = new Date();
+    const startHari = new Date(now); startHari.setHours(0,0,0,0);
+    const startMinggu = new Date(now); startMinggu.setDate(now.getDate() - now.getDay()); startMinggu.setHours(0,0,0,0);
+    const startBulan = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    const [snapAll, snapPending] = await Promise.all([
+      getDocs(query(collection(db, COLLECTIONS.SETORAN), where('status', '==', STATUS_SETORAN.DITERIMA))),
+      getDocs(query(collection(db, COLLECTIONS.SETORAN), where('status', '==', STATUS_SETORAN.PENDING)))
+    ]);
+
+    let hariIni = 0, mingguIni = 0, bulanIni = 0, totalDiterima = 0;
+    snapAll.docs.forEach(doc => {
+      const data = doc.data();
+      const nominal = data.nominal || 0;
+      totalDiterima += nominal;
+      const ts = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+      if (ts >= startHari) hariIni += nominal;
+      if (ts >= startMinggu) mingguIni += nominal;
+      if (ts >= startBulan) bulanIni += nominal;
+    });
+
+    return { hariIni, mingguIni, bulanIni, pending: snapPending.size, totalDiterima };
+  } catch (error) {
+    console.error('Error:', error);
+    return { hariIni: 0, mingguIni: 0, bulanIni: 0, pending: 0, totalDiterima: 0 };
+  }
+};
+
+export const getSetoranRecentAll = async (limitN = 30) => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      orderBy('createdAt', 'desc'),
+      limit(limitN)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const approveSetoranBatch = async (setoranList) => {
+  if (!db) throw new Error('Firestore not initialized');
+  const promises = setoranList.map(s => approveSetoran(s.id, s.kenclengId, s.nominal));
+  await Promise.all(promises);
+};
+
+export const getKenclengWithStats = async () => {
+  if (!db) return [];
+  try {
+    const [kenclengSnap, setoranSnap] = await Promise.all([
+      getDocs(query(collection(db, COLLECTIONS.KENCLENG), orderBy('saldo', 'desc'))),
+      getDocs(query(collection(db, COLLECTIONS.SETORAN), where('status', '==', STATUS_SETORAN.DITERIMA)))
+    ]);
+
+    const setoranByKencleng = {};
+    setoranSnap.docs.forEach(doc => {
+      const data = doc.data();
+      if (!setoranByKencleng[data.kenclengId]) setoranByKencleng[data.kenclengId] = { count: 0, lastDate: null };
+      setoranByKencleng[data.kenclengId].count++;
+      const ts = data.createdAt?.toDate ? data.createdAt.toDate() : new Date(data.createdAt);
+      if (!setoranByKencleng[data.kenclengId].lastDate || ts > setoranByKencleng[data.kenclengId].lastDate) {
+        setoranByKencleng[data.kenclengId].lastDate = ts;
+      }
+    });
+
+    return kenclengSnap.docs.map(d => {
+      const k = { id: d.id, ...d.data() };
+      const stats = setoranByKencleng[k.id] || { count: 0, lastDate: null };
+      return { ...k, jumlahSetoran: stats.count, lastSetoran: stats.lastDate };
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
