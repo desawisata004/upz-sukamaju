@@ -18,6 +18,7 @@ const LoginPage = () => {
   // Redirect if already logged in
   useEffect(() => {
     if (userData) {
+      console.log('User sudah login, redirect ke dashboard');
       const role = userData.role;
       if (role === ROLES.ADMIN) navigate(ROUTES.ADMIN_DASHBOARD);
       else if (role === ROLES.RT) navigate(ROUTES.RT_DASHBOARD);
@@ -25,7 +26,6 @@ const LoginPage = () => {
     }
   }, [userData, navigate]);
 
-  // Tampilkan error dari auth context
   useEffect(() => {
     if (authError) {
       setAlert({ type: 'error', message: authError });
@@ -39,18 +39,15 @@ const LoginPage = () => {
       return;
     }
 
-    if (!email.includes('@')) {
-      setAlert({ type: 'error', message: 'Format email tidak valid.' });
-      return;
-    }
-
     setLoading(true);
     setAlert(null);
     
     try {
+      console.log('Mencoba login dengan:', email);
       await loginWithEmail(email, password);
       // Redirect akan terjadi via useEffect
     } catch (err) {
+      console.error('Login error di komponen:', err);
       setAlert({ 
         type: 'error', 
         message: err.message || 'Gagal login. Periksa koneksi Anda.' 
@@ -58,6 +55,12 @@ const LoginPage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Untuk testing - akun sementara
+  const fillDemoAccount = () => {
+    setEmail('admin@rt05.com');
+    setPassword('password123');
   };
 
   const inputStyle = {
@@ -84,33 +87,6 @@ const LoginPage = () => {
         padding: 20,
       }}
     >
-      {/* Decorative circles */}
-      <div
-        style={{
-          position: 'absolute',
-          top: -60,
-          right: -60,
-          width: 200,
-          height: 200,
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.05)',
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: -80,
-          left: -40,
-          width: 280,
-          height: 280,
-          borderRadius: '50%',
-          background: 'rgba(255,255,255,0.04)',
-          pointerEvents: 'none',
-        }}
-      />
-
-      {/* Card */}
       <div
         style={{
           width: '100%',
@@ -124,7 +100,6 @@ const LoginPage = () => {
           zIndex: 1,
         }}
       >
-        {/* Logo */}
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <div
             style={{
@@ -184,9 +159,6 @@ const LoginPage = () => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="nama@email.com"
               style={inputStyle}
-              onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
               disabled={loading}
             />
           </div>
@@ -211,9 +183,6 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               style={inputStyle}
-              onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
-              onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
-              onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
               disabled={loading}
             />
           </div>
@@ -227,18 +196,24 @@ const LoginPage = () => {
           >
             Masuk
           </Button>
-        </div>
 
-        <p
-          style={{
-            textAlign: 'center',
-            fontSize: '0.8rem',
-            color: 'var(--abu-400)',
-            marginTop: 24,
-          }}
-        >
-          Belum punya akun? Hubungi pengurus RT.
-        </p>
+          {/* Tombol demo - hapus setelah testing */}
+          <button
+            onClick={fillDemoAccount}
+            style={{
+              marginTop: 8,
+              padding: '8px',
+              background: 'none',
+              border: '1px dashed var(--abu-300)',
+              borderRadius: 'var(--radius-md)',
+              color: 'var(--abu-500)',
+              fontSize: '0.8rem',
+              cursor: 'pointer',
+            }}
+          >
+            🔧 Isi Demo Account
+          </button>
+        </div>
       </div>
     </div>
   );
