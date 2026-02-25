@@ -2,7 +2,12 @@
 import QRCode from 'qrcode';
 
 export const generateQRData = (kenclengId, userId, nama) => {
-  return JSON.stringify({ kenclengId, userId, nama, v: 1 });
+  return JSON.stringify({ 
+    kenclengId, 
+    userId, 
+    nama, 
+    v: 1 
+  });
 };
 
 export const generateQRCodeDataURL = async (data) => {

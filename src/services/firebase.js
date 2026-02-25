@@ -4,15 +4,15 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getMessaging, isSupported } from 'firebase/messaging';
 
-// Firebase configuration - hardcode dulu untuk testing
+// Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyCKezmnqYrzPfO-MB2ur2x0aIdx8iYJWMM",
-  authDomain: "upz-sukamaju.firebaseapp.com",
-  projectId: "upz-sukamaju",
-  storageBucket: "upz-sukamaju.firebasestorage.app",
-  messagingSenderId: "511069915901",
-  appId: "1:511069915901:web:c8ec6af8961a75dd878c94",
-  measurementId: ""
+  apiKey: process.env.REACT_APP_FIREBASE_API_KEY || "AIzaSyCKezmnqYrzPfO-MB2ur2x0aIdx8iYJWMM",
+  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN || "upz-sukamaju.firebaseapp.com",
+  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID || "upz-sukamaju",
+  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET || "upz-sukamaju.firebasestorage.app",
+  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID || "511069915901",
+  appId: process.env.REACT_APP_FIREBASE_APP_ID || "1:511069915901:web:c8ec6af8961a75dd878c94",
+  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID || ""
 };
 
 // Inisialisasi Firebase
@@ -20,19 +20,15 @@ let app = null;
 let auth = null;
 let db = null;
 
-// Inisialisasi hanya di browser
 if (typeof window !== 'undefined') {
   try {
-    console.log('Mencoba inisialisasi Firebase dengan config:', firebaseConfig);
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
-    console.log('✅ Firebase initialized successfully');
+    console.log('✅ Firebase initialized');
   } catch (error) {
-    console.error('❌ Firebase initialization error:', error);
+    console.error('❌ Firebase init error:', error);
   }
-} else {
-  console.log('Running on server, skipping Firebase init');
 }
 
 export { auth, db };

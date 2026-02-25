@@ -17,10 +17,11 @@ import {
 import { db } from './firebase';
 import { COLLECTIONS, STATUS_KENCLENG, STATUS_SETORAN } from '../config/constants';
 
-// ── Kencleng ──────────────────────────────────────────────────────────────────
+// ==================== KENCLENG ====================
 
 export const createKencleng = async ({ userId, nama, target }) => {
   if (!db) throw new Error('Firestore not initialized');
+  
   const data = {
     userId,
     nama,
@@ -30,12 +31,14 @@ export const createKencleng = async ({ userId, nama, target }) => {
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
+  
   const ref = await addDoc(collection(db, COLLECTIONS.KENCLENG), data);
   return { id: ref.id, ...data };
 };
 
 export const getKenclengByUser = async (userId) => {
   if (!db) return [];
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.KENCLENG),
@@ -45,32 +48,34 @@ export const getKenclengByUser = async (userId) => {
     const snap = await getDocs(q);
     return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
-    console.error('Error getting kencleng by user:', error);
+    console.error('Error:', error);
     return [];
   }
 };
 
 export const getKenclengById = async (id) => {
   if (!db) return null;
+  
   try {
     const snap = await getDoc(doc(db, COLLECTIONS.KENCLENG, id));
     if (!snap.exists()) return null;
     return { id: snap.id, ...snap.data() };
   } catch (error) {
-    console.error('Error getting kencleng by id:', error);
+    console.error('Error:', error);
     return null;
   }
 };
 
 export const getAllKencleng = async () => {
   if (!db) return [];
+  
   try {
     const q = query(collection(db, COLLECTIONS.KENCLENG), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
     const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
     return data.sort((a, b) => (b.saldo || 0) - (a.saldo || 0));
   } catch (error) {
-    console.error('Error getting all kencleng:', error);
+    console.error('Error:', error);
     return [];
   }
 };
@@ -85,6 +90,7 @@ export const updateKenclengStatus = async (id, status) => {
 
 export const subscribeKencleng = (userId, callback) => {
   if (!db) return () => {};
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.KENCLENG),
@@ -95,35 +101,39 @@ export const subscribeKencleng = (userId, callback) => {
       callback(data);
     });
   } catch (error) {
-    console.error('Error subscribing to kencleng:', error);
+    console.error('Error:', error);
     return () => {};
   }
 };
 
-// ── Setoran ───────────────────────────────────────────────────────────────────
+// ==================== SETORAN ====================
 
 export const createSetoran = async ({ kenclengId, userId, nominal, catatan, inputBy }) => {
   if (!db) throw new Error('Firestore not initialized');
+  
   const data = {
     kenclengId,
     userId,
     nominal,
     catatan: catatan || '',
     status: STATUS_SETORAN.PENDING,
-    inputBy,
+    inputBy: inputBy || 'system',
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
   };
+  
   const ref = await addDoc(collection(db, COLLECTIONS.SETORAN), data);
   return { id: ref.id, ...data };
 };
 
 export const approveSetoran = async (setoranId, kenclengId, nominal) => {
   if (!db) throw new Error('Firestore not initialized');
+  
   await updateDoc(doc(db, COLLECTIONS.SETORAN, setoranId), {
     status: STATUS_SETORAN.DITERIMA,
     updatedAt: serverTimestamp(),
   });
+  
   await updateDoc(doc(db, COLLECTIONS.KENCLENG, kenclengId), {
     saldo: increment(nominal),
     updatedAt: serverTimestamp(),
@@ -132,6 +142,7 @@ export const approveSetoran = async (setoranId, kenclengId, nominal) => {
 
 export const rejectSetoran = async (setoranId, alasan) => {
   if (!db) throw new Error('Firestore not initialized');
+  
   await updateDoc(doc(db, COLLECTIONS.SETORAN, setoranId), {
     status: STATUS_SETORAN.DITOLAK,
     alasanDitolak: alasan || '',
@@ -141,6 +152,7 @@ export const rejectSetoran = async (setoranId, alasan) => {
 
 export const getRiwayatSetoran = async (kenclengId) => {
   if (!db) return [];
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.SETORAN),
@@ -151,13 +163,14 @@ export const getRiwayatSetoran = async (kenclengId) => {
     const snap = await getDocs(q);
     return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
-    console.error('Error getting riwayat setoran:', error);
+    console.error('Error:', error);
     return [];
   }
 };
 
 export const getPendingSetoran = async () => {
   if (!db) return [];
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.SETORAN),
@@ -167,13 +180,14 @@ export const getPendingSetoran = async () => {
     const snap = await getDocs(q);
     return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
   } catch (error) {
-    console.error('Error getting pending setoran:', error);
+    console.error('Error:', error);
     return [];
   }
 };
 
 export const subscribeSetoran = (kenclengId, callback) => {
   if (!db) return () => {};
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.SETORAN),
@@ -186,13 +200,14 @@ export const subscribeSetoran = (kenclengId, callback) => {
       callback(data);
     });
   } catch (error) {
-    console.error('Error subscribing to setoran:', error);
+    console.error('Error:', error);
     return () => {};
   }
 };
 
 export const getLeaderboard = async () => {
   if (!db) return [];
+  
   try {
     const q = query(
       collection(db, COLLECTIONS.KENCLENG),
@@ -202,35 +217,17 @@ export const getLeaderboard = async () => {
     const snap = await getDocs(q);
     return snap.docs
       .map((d) => ({ id: d.id, ...d.data() }))
-      .filter((k) => k.status !== 'nonaktif')
+      .filter((k) => k.status !== STATUS_KENCLENG.NONAKTIF)
       .slice(0, 20);
   } catch (error) {
-    console.error('Error getting leaderboard:', error);
-    return [];
-  }
-};
-// Tambahkan fungsi ini di kenclengService.js
-
-export const getSetoranByDate = async (kenclengId, startDate, endDate) => {
-  if (!db) return [];
-  try {
-    const q = query(
-      collection(db, COLLECTIONS.SETORAN),
-      where('kenclengId', '==', kenclengId),
-      where('createdAt', '>=', startDate),
-      where('createdAt', '<=', endDate),
-      orderBy('createdAt', 'desc')
-    );
-    const snap = await getDocs(q);
-    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  } catch (error) {
-    console.error('Error getting setoran by date:', error);
+    console.error('Error:', error);
     return [];
   }
 };
 
 export const getTotalSetoranHariIni = async () => {
   if (!db) return 0;
+  
   try {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -247,7 +244,7 @@ export const getTotalSetoranHariIni = async () => {
     const snap = await getDocs(q);
     return snap.docs.reduce((total, doc) => total + (doc.data().nominal || 0), 0);
   } catch (error) {
-    console.error('Error getting total setoran hari ini:', error);
+    console.error('Error:', error);
     return 0;
   }
 };

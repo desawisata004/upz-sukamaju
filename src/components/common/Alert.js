@@ -2,10 +2,30 @@
 import React, { useEffect } from 'react';
 
 const types = {
-  success: { bg: 'var(--hijau-pale)', color: 'var(--hijau)', icon: '✅', border: 'var(--hijau)' },
-  error: { bg: '#fdeaea', color: 'var(--danger)', icon: '❌', border: 'var(--danger)' },
-  warning: { bg: 'var(--kuning-pale)', color: 'var(--kuning)', icon: '⚠️', border: 'var(--kuning)' },
-  info: { bg: '#eaf3fb', color: 'var(--info)', icon: 'ℹ️', border: 'var(--info)' },
+  success: { 
+    bg: 'var(--hijau-pale)', 
+    color: 'var(--hijau)', 
+    icon: '✅', 
+    border: 'var(--hijau)' 
+  },
+  error: { 
+    bg: '#fdeaea', 
+    color: 'var(--danger)', 
+    icon: '❌', 
+    border: 'var(--danger)' 
+  },
+  warning: { 
+    bg: 'var(--kuning-pale)', 
+    color: 'var(--kuning)', 
+    icon: '⚠️', 
+    border: 'var(--kuning)' 
+  },
+  info: { 
+    bg: '#eaf3fb', 
+    color: 'var(--info)', 
+    icon: 'ℹ️', 
+    border: 'var(--info)' 
+  },
 };
 
 const Alert = ({ type = 'info', message, onClose, autoClose = 0 }) => {

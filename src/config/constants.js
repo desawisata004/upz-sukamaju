@@ -12,7 +12,6 @@ export const ROLES = {
 export const STATUS_KENCLENG = {
   AKTIF: 'aktif',
   NONAKTIF: 'nonaktif',
-  PENUH: 'penuh',
 };
 
 export const STATUS_SETORAN = {
@@ -23,7 +22,7 @@ export const STATUS_SETORAN = {
 
 export const NOMINAL_PRESETS = [5000, 10000, 20000, 50000, 100000];
 
-export const TARGET_TABUNGAN = 500000; // default target per kencleng
+export const TARGET_TABUNGAN = 500000;
 
 export const ROUTES = {
   HOME: '/',

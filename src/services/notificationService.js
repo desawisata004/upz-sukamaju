@@ -3,16 +3,22 @@ import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { db } from './firebase';
 import { COLLECTIONS } from '../config/constants';
 
-export const sendNotification = async ({ userId, title, body, type, data }) => {
-  await addDoc(collection(db, COLLECTIONS.NOTIFICATIONS), {
-    userId,
-    title,
-    body,
-    type,
-    data: data || {},
-    read: false,
-    createdAt: serverTimestamp(),
-  });
+export const sendNotification = async ({ userId, title, body, type, data = {} }) => {
+  if (!db) return;
+  
+  try {
+    await addDoc(collection(db, COLLECTIONS.NOTIFICATIONS), {
+      userId,
+      title,
+      body,
+      type,
+      data,
+      read: false,
+      createdAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Error sending notification:', error);
+  }
 };
 
 export const notifySetoranDiterima = (userId, nominal) =>

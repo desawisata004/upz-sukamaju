@@ -20,7 +20,7 @@ export const useRealtimeKencleng = (userId) => {
         setLoading(false);
       });
     } catch (error) {
-      console.error('Error in useRealtimeKencleng:', error);
+      console.error('Error:', error);
       setLoading(false);
     }
     
@@ -52,7 +52,7 @@ export const useRealtimeSetoran = (kenclengId) => {
         setLoading(false);
       });
     } catch (error) {
-      console.error('Error in useRealtimeSetoran:', error);
+      console.error('Error:', error);
       setLoading(false);
     }
     

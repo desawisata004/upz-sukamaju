@@ -27,7 +27,6 @@ const LeaderboardItem = ({ item, rank }) => {
         animationFillMode: 'forwards',
       }}
     >
-      {/* Rank */}
       <div
         style={{
           width: 36,
@@ -44,7 +43,6 @@ const LeaderboardItem = ({ item, rank }) => {
         {isTop3 ? medals[rank] : rank + 1}
       </div>
 
-      {/* Avatar */}
       <div
         style={{
           width: 40,
@@ -65,7 +63,6 @@ const LeaderboardItem = ({ item, rank }) => {
         {initials(item.nama)}
       </div>
 
-      {/* Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
@@ -99,7 +96,6 @@ const LeaderboardItem = ({ item, rank }) => {
           </span>
         </div>
 
-        {/* Progress bar */}
         <div
           style={{
             height: 6,

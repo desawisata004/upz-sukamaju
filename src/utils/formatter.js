@@ -10,7 +10,6 @@ export const formatRupiah = (amount) => {
   }).format(amount);
 };
 
-// Helper untuk validasi tanggal
 const isValidDate = (date) => {
   if (!date) return false;
   
@@ -37,15 +36,9 @@ const safeFormatDate = (timestamp, formatter) => {
       return '-';
     }
     
-    // Validasi tanggal valid
-    if (isNaN(date.getTime())) {
-      console.warn('Invalid date:', timestamp);
-      return '-';
-    }
-    
+    if (isNaN(date.getTime())) return '-';
     return formatter.format(date);
-  } catch (error) {
-    console.warn('Error formatting date:', error);
+  } catch {
     return '-';
   }
 };

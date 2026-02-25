@@ -15,15 +15,12 @@ export const AuthProvider = ({ children }) => {
     
     const initAuth = async () => {
       try {
-        console.log('Memasang auth listener...');
         unsubscribe = onAuthChange(async (firebaseUser) => {
-          console.log('Auth change detected:', firebaseUser ? firebaseUser.email : 'logged out');
           setUser(firebaseUser);
           
           if (firebaseUser) {
             try {
               const data = await getUserData(firebaseUser.uid);
-              console.log('User data loaded:', data);
               setUserData(data);
             } catch (err) {
               console.error('Error fetching user data:', err);

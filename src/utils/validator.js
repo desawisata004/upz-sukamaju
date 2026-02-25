@@ -14,14 +14,16 @@ export const validateNominal = (nominal) => {
 };
 
 export const validatePassword = (password) => {
-  if (!password || password.length < 6)
+  if (!password || password.length < 6) {
     return { valid: false, message: 'Password minimal 6 karakter' };
+  }
   return { valid: true };
 };
 
 export const validateNama = (nama) => {
-  if (!nama || nama.trim().length < 2)
+  if (!nama || nama.trim().length < 2) {
     return { valid: false, message: 'Nama minimal 2 karakter' };
+  }
   return { valid: true };
 };
 

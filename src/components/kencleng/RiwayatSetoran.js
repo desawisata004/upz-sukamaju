@@ -5,9 +5,24 @@ import { STATUS_SETORAN } from '../../config/constants';
 import { Spinner } from '../common/Loading';
 
 const statusConfig = {
-  [STATUS_SETORAN.PENDING]: { label: 'Menunggu', color: 'var(--kuning)', bg: 'var(--kuning-pale)', icon: '⏳' },
-  [STATUS_SETORAN.DITERIMA]: { label: 'Diterima', color: 'var(--hijau)', bg: 'var(--hijau-pale)', icon: '✅' },
-  [STATUS_SETORAN.DITOLAK]: { label: 'Ditolak', color: 'var(--danger)', bg: '#fdeaea', icon: '❌' },
+  [STATUS_SETORAN.PENDING]: { 
+    label: 'Menunggu', 
+    color: 'var(--kuning)', 
+    bg: 'var(--kuning-pale)', 
+    icon: '⏳' 
+  },
+  [STATUS_SETORAN.DITERIMA]: { 
+    label: 'Diterima', 
+    color: 'var(--hijau)', 
+    bg: 'var(--hijau-pale)', 
+    icon: '✅' 
+  },
+  [STATUS_SETORAN.DITOLAK]: { 
+    label: 'Ditolak', 
+    color: 'var(--danger)', 
+    bg: '#fdeaea', 
+    icon: '❌' 
+  },
 };
 
 const SetoranItem = ({ item, onApprove, onReject }) => {
@@ -26,7 +41,6 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
         animation: 'fadeIn 0.3s ease',
       }}
     >
-      {/* Icon */}
       <div
         style={{
           width: 40,
@@ -43,7 +57,6 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
         {status.icon}
       </div>
 
-      {/* Content */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 8 }}>
           <span
@@ -86,7 +99,6 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
           </p>
         )}
 
-        {/* RT Actions */}
         {onApprove && item.status === STATUS_SETORAN.PENDING && (
           <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
             <button
@@ -101,7 +113,6 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
-                transition: 'all var(--transition)',
               }}
             >
               ✓ Terima
@@ -118,7 +129,6 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
                 fontWeight: 600,
                 cursor: 'pointer',
                 fontFamily: 'var(--font-body)',
-                transition: 'all var(--transition)',
               }}
             >
               ✕ Tolak
