@@ -16,37 +16,36 @@ const firebaseConfig = {
 };
 
 // Validasi konfigurasi
-const isConfigValid = () => {
-  return (
-    firebaseConfig.apiKey &&
-    firebaseConfig.apiKey !== 'dummy-api-key' &&
-    firebaseConfig.authDomain &&
-    firebaseConfig.projectId
-  );
+const validateConfig = () => {
+  const required = ['apiKey', 'authDomain', 'projectId'];
+  const missing = required.filter(key => !firebaseConfig[key]);
+  
+  if (missing.length > 0) {
+    console.error('Firebase config missing:', missing.join(', '));
+    return false;
+  }
+  return true;
 };
 
-// Inisialisasi Firebase hanya jika di browser dan memiliki konfigurasi valid
-let app;
-let auth;
-let db;
+// Inisialisasi Firebase
+let app = null;
+let auth = null;
+let db = null;
 
-try {
-  if (typeof window !== 'undefined' && isConfigValid()) {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-    console.log('Firebase initialized successfully');
-  } else {
-    console.warn('Firebase config missing or invalid, running in mock mode');
-    app = null;
-    auth = null;
-    db = null;
+// Inisialisasi hanya di browser
+if (typeof window !== 'undefined') {
+  try {
+    if (validateConfig()) {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      console.log('✅ Firebase initialized successfully');
+    } else {
+      console.error('❌ Firebase config tidak lengkap');
+    }
+  } catch (error) {
+    console.error('❌ Firebase initialization error:', error);
   }
-} catch (error) {
-  console.error('Firebase initialization error:', error);
-  app = null;
-  auth = null;
-  db = null;
 }
 
 export { auth, db };

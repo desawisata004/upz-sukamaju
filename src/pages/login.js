@@ -1,5 +1,5 @@
 // src/pages/login.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginWithEmail } from '../services/auth';
 import { useAuth } from '../hooks/useAuth';
@@ -13,10 +13,10 @@ const LoginPage = () => {
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState(null);
   const navigate = useNavigate();
-  const { userData } = useAuth();
+  const { userData, error: authError } = useAuth();
 
   // Redirect if already logged in
-  React.useEffect(() => {
+  useEffect(() => {
     if (userData) {
       const role = userData.role;
       if (role === ROLES.ADMIN) navigate(ROUTES.ADMIN_DASHBOARD);
@@ -25,21 +25,36 @@ const LoginPage = () => {
     }
   }, [userData, navigate]);
 
+  // Tampilkan error dari auth context
+  useEffect(() => {
+    if (authError) {
+      setAlert({ type: 'error', message: authError });
+    }
+  }, [authError]);
+
   const handleLogin = async () => {
+    // Validasi input
     if (!email || !password) {
       setAlert({ type: 'error', message: 'Email dan password wajib diisi.' });
       return;
     }
+
+    if (!email.includes('@')) {
+      setAlert({ type: 'error', message: 'Format email tidak valid.' });
+      return;
+    }
+
     setLoading(true);
+    setAlert(null);
+    
     try {
       await loginWithEmail(email, password);
-      // Redirect will happen via useEffect above
+      // Redirect akan terjadi via useEffect
     } catch (err) {
-      const msg =
-        err.code === 'auth/user-not-found' || err.code === 'auth/wrong-password'
-          ? 'Email atau password salah.'
-          : 'Gagal login: ' + err.message;
-      setAlert({ type: 'error', message: msg });
+      setAlert({ 
+        type: 'error', 
+        message: err.message || 'Gagal login. Periksa koneksi Anda.' 
+      });
     } finally {
       setLoading(false);
     }
@@ -172,6 +187,7 @@ const LoginPage = () => {
               onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              disabled={loading}
             />
           </div>
 
@@ -198,6 +214,7 @@ const LoginPage = () => {
               onFocus={(e) => { e.target.style.borderColor = 'var(--hijau)'; }}
               onBlur={(e) => { e.target.style.borderColor = 'var(--abu-200)'; }}
               onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+              disabled={loading}
             />
           </div>
 

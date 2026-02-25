@@ -8,29 +8,32 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    let unsub = () => {};
+    let unsubscribe = () => {};
     
     const initAuth = async () => {
       try {
-        unsub = await onAuthChange(async (firebaseUser) => {
+        unsubscribe = onAuthChange(async (firebaseUser) => {
           setUser(firebaseUser);
           if (firebaseUser) {
             try {
               const data = await getUserData(firebaseUser.uid);
               setUserData(data);
-            } catch (error) {
-              console.error('Error fetching user data:', error);
+            } catch (err) {
+              console.error('Error fetching user data:', err);
               setUserData(null);
             }
           } else {
             setUserData(null);
           }
           setLoading(false);
+          setError(null);
         });
-      } catch (error) {
-        console.error('Auth initialization error:', error);
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+        setError(err.message);
         setLoading(false);
       }
     };
@@ -38,14 +41,14 @@ export const AuthProvider = ({ children }) => {
     initAuth();
     
     return () => {
-      if (typeof unsub === 'function') {
-        unsub();
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
       }
     };
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, userData, loading, setUserData }}>
+    <AuthContext.Provider value={{ user, userData, loading, error, setUserData }}>
       {children}
     </AuthContext.Provider>
   );
