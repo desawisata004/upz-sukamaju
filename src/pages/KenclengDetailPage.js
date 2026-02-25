@@ -25,19 +25,27 @@ const KenclengDetailPage = () => {
 
   useEffect(() => {
     const load = async () => {
-      const k = await getKenclengById(id);
-      if (!k) { navigate('/'); return; }
-      setKencleng(k);
+      try {
+        const k = await getKenclengById(id);
+        if (!k) { 
+          navigate('/'); 
+          return; 
+        }
+        setKencleng(k);
 
-      // Generate QR
-      const qrData = generateQRData(k.id, k.userId, k.nama);
-      const url = await generateQRCodeDataURL(qrData);
-      setQrUrl(url);
+        // Generate QR
+        const qrData = generateQRData(k.id, k.userId, k.nama);
+        const url = await generateQRCodeDataURL(qrData);
+        setQrUrl(url);
 
-      // Load setoran
-      const s = await getRiwayatSetoran(id);
-      setSetoran(s);
-      setLoading(false);
+        // Load setoran
+        const s = await getRiwayatSetoran(id);
+        setSetoran(s || []);
+      } catch (error) {
+        console.error('Error loading kencleng detail:', error);
+      } finally {
+        setLoading(false);
+      }
     };
     load();
   }, [id, navigate]);
@@ -61,7 +69,7 @@ const KenclengDetailPage = () => {
 
   return (
     <div className="app-layout">
-      <Header title={kencleng.nama} showBack />
+      <Header title={kencleng.nama || 'Kencleng'} showBack />
 
       <div className="page-content">
         {/* Hero card */}

@@ -69,7 +69,7 @@ const ProfilPage = () => {
             {initials(userData?.nama)}
           </div>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '1.4rem', color: 'var(--hitam)' }}>
-            {userData?.nama}
+            {userData?.nama || 'User'}
           </h2>
           <span
             style={{
@@ -96,11 +96,11 @@ const ProfilPage = () => {
           <InfoRow label="Email" value={userData?.email} />
           <InfoRow label="No. HP" value={userData?.noHp} />
           <InfoRow label="Alamat" value={userData?.alamat} />
-          <InfoRow label="Bergabung" value={formatTanggalShort(userData?.createdAt)} />
+          <InfoRow label="Bergabung" value={userData?.createdAt ? formatTanggalShort(userData.createdAt) : '-'} />
         </Card>
 
         {/* Shortcuts for non-warga */}
-        {userData?.role !== ROLES.WARGA && (
+        {userData?.role && userData.role !== ROLES.WARGA && (
           <Card style={{ marginBottom: 16 }}>
             <h3 style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--abu-500)', textTransform: 'uppercase', letterSpacing: '0.05em', marginBottom: 12 }}>
               Menu Pengurus

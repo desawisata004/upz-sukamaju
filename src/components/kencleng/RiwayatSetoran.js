@@ -77,7 +77,7 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
         )}
 
         <p style={{ fontSize: '0.75rem', color: 'var(--abu-400)', marginTop: 4 }}>
-          {formatTimeAgo(item.createdAt)}
+          {item.createdAt ? formatTimeAgo(item.createdAt) : '-'}
         </p>
 
         {item.status === STATUS_SETORAN.DITOLAK && item.alasanDitolak && (
@@ -139,7 +139,7 @@ const RiwayatSetoran = ({ data = [], loading, onApprove, onReject }) => {
     );
   }
 
-  if (data.length === 0) {
+  if (!data || data.length === 0) {
     return (
       <div className="empty-state">
         <div className="empty-icon">📋</div>

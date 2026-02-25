@@ -10,47 +10,101 @@ export const formatRupiah = (amount) => {
   }).format(amount);
 };
 
-export const formatTanggal = (timestamp) => {
+// Helper untuk validasi tanggal
+const isValidDate = (date) => {
+  if (!date) return false;
+  
+  try {
+    const d = date?.toDate ? date.toDate() : new Date(date);
+    return d instanceof Date && !isNaN(d.getTime());
+  } catch {
+    return false;
+  }
+};
+
+const safeFormatDate = (timestamp, formatter) => {
   if (!timestamp) return '-';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
-  return new Intl.DateTimeFormat('id-ID', {
+  
+  try {
+    let date;
+    if (timestamp?.toDate) {
+      date = timestamp.toDate();
+    } else if (timestamp instanceof Date) {
+      date = timestamp;
+    } else if (typeof timestamp === 'string' || typeof timestamp === 'number') {
+      date = new Date(timestamp);
+    } else {
+      return '-';
+    }
+    
+    // Validasi tanggal valid
+    if (isNaN(date.getTime())) {
+      console.warn('Invalid date:', timestamp);
+      return '-';
+    }
+    
+    return formatter.format(date);
+  } catch (error) {
+    console.warn('Error formatting date:', error);
+    return '-';
+  }
+};
+
+export const formatTanggal = (timestamp) => {
+  const formatter = new Intl.DateTimeFormat('id-ID', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(date);
+  });
+  return safeFormatDate(timestamp, formatter);
 };
 
 export const formatTanggalShort = (timestamp) => {
-  if (!timestamp) return '-';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
-  return new Intl.DateTimeFormat('id-ID', {
+  const formatter = new Intl.DateTimeFormat('id-ID', {
     day: 'numeric',
     month: 'short',
     year: 'numeric',
-  }).format(date);
+  });
+  return safeFormatDate(timestamp, formatter);
 };
 
 export const formatTimeAgo = (timestamp) => {
   if (!timestamp) return '-';
-  const date = timestamp?.toDate ? timestamp.toDate() : new Date(timestamp);
-  const now = new Date();
-  const diffMs = now - date;
-  const diffMins = Math.floor(diffMs / 60000);
-  const diffHours = Math.floor(diffMins / 60);
-  const diffDays = Math.floor(diffHours / 24);
+  
+  try {
+    let date;
+    if (timestamp?.toDate) {
+      date = timestamp.toDate();
+    } else if (timestamp instanceof Date) {
+      date = timestamp;
+    } else {
+      date = new Date(timestamp);
+    }
+    
+    if (isNaN(date.getTime())) return '-';
+    
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-  if (diffMins < 1) return 'Baru saja';
-  if (diffMins < 60) return `${diffMins} menit lalu`;
-  if (diffHours < 24) return `${diffHours} jam lalu`;
-  if (diffDays < 7) return `${diffDays} hari lalu`;
-  return formatTanggalShort(timestamp);
+    if (diffMins < 1) return 'Baru saja';
+    if (diffMins < 60) return `${diffMins} menit lalu`;
+    if (diffHours < 24) return `${diffHours} jam lalu`;
+    if (diffDays < 7) return `${diffDays} hari lalu`;
+    return formatTanggalShort(timestamp);
+  } catch {
+    return '-';
+  }
 };
 
 export const formatProgress = (saldo, target) => {
   if (!target || target === 0) return 0;
-  return Math.min(100, Math.round((saldo / target) * 100));
+  const progress = (saldo / target) * 100;
+  return Math.min(100, Math.max(0, Math.round(progress)));
 };
 
 export const initials = (name) => {
