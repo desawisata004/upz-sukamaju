@@ -1,0 +1,226 @@
+/* =============================================
+   KENCLENG DIGITAL — Global Styles
+   Aesthetic: Earthy-modern Indonesian community app
+   ============================================= */
+
+:root {
+  /* Brand Colors — inspired by batik earth tones */
+  --hijau: #1a6b3c;
+  --hijau-muda: #2d9155;
+  --hijau-pale: #e8f5ee;
+  --kuning: #e8a020;
+  --kuning-pale: #fef8ec;
+  --coklat: #5c3d1e;
+  --coklat-pale: #f5f0e8;
+
+  /* Neutrals */
+  --putih: #fafaf8;
+  --abu-100: #f0ede8;
+  --abu-200: #e0dbd3;
+  --abu-300: #c5bfb5;
+  --abu-400: #9e9890;
+  --abu-500: #706a62;
+  --abu-700: #3d3830;
+  --hitam: #1c1a16;
+
+  /* Semantic */
+  --success: #1a6b3c;
+  --warning: #e8a020;
+  --danger: #c0392b;
+  --info: #2471a3;
+
+  /* Typography */
+  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+
+  /* Spacing */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(28,26,22,0.08), 0 1px 2px rgba(28,26,22,0.06);
+  --shadow-md: 0 4px 12px rgba(28,26,22,0.10), 0 2px 4px rgba(28,26,22,0.06);
+  --shadow-lg: 0 12px 32px rgba(28,26,22,0.12), 0 4px 8px rgba(28,26,22,0.08);
+
+  /* Transitions */
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--coklat-pale);
+  color: var(--hitam);
+  line-height: 1.6;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---- App Layout ---- */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--coklat-pale);
+  position: relative;
+  box-shadow: 0 0 60px rgba(28,26,22,0.15);
+}
+
+.page-content {
+  flex: 1;
+  padding: 16px;
+  padding-bottom: 90px; /* space for bottom nav */
+}
+
+/* ---- Typography ---- */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  line-height: 1.2;
+}
+
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.25rem; }
+
+p { margin-bottom: 0.5rem; }
+p:last-child { margin-bottom: 0; }
+
+a {
+  color: var(--hijau);
+  text-decoration: none;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--abu-300); border-radius: 2px; }
+
+/* ---- Utility Classes ---- */
+.text-hijau { color: var(--hijau); }
+.text-kuning { color: var(--kuning); }
+.text-danger { color: var(--danger); }
+.text-muted { color: var(--abu-500); }
+.text-sm { font-size: 0.875rem; }
+.text-xs { font-size: 0.75rem; }
+.text-lg { font-size: 1.125rem; }
+.font-bold { font-weight: 700; }
+.font-semibold { font-weight: 600; }
+.font-medium { font-weight: 500; }
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.justify-center { justify-content: center; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+
+.w-full { width: 100%; }
+.text-center { text-align: center; }
+
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+
+/* ---- Form Elements ---- */
+input, select, textarea {
+  font-family: var(--font-body);
+  font-size: 1rem;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+}
+
+/* ---- Animations ---- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.animate-fade-in { animation: fadeIn 0.3s ease forwards; }
+.animate-slide-up { animation: slideUp 0.4s cubic-bezier(0.4,0,0.2,1) forwards; }
+
+/* ---- Skeleton Loading ---- */
+.skeleton {
+  background: linear-gradient(90deg, var(--abu-100) 25%, var(--abu-200) 50%, var(--abu-100) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+/* ---- Status Badge ---- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.badge-success { background: var(--hijau-pale); color: var(--hijau); }
+.badge-warning { background: var(--kuning-pale); color: var(--kuning); }
+.badge-danger { background: #fdeaea; color: var(--danger); }
+
+/* ---- Empty State ---- */
+.empty-state {
+  text-align: center;
+  padding: 48px 24px;
+  color: var(--abu-500);
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
