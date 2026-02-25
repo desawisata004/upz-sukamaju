@@ -20,6 +20,7 @@ import { COLLECTIONS, STATUS_KENCLENG, STATUS_SETORAN } from '../config/constant
 // ── Kencleng ──────────────────────────────────────────────────────────────────
 
 export const createKencleng = async ({ userId, nama, target }) => {
+  if (!db) throw new Error('Firestore not initialized');
   const data = {
     userId,
     nama,
@@ -34,30 +35,48 @@ export const createKencleng = async ({ userId, nama, target }) => {
 };
 
 export const getKenclengByUser = async (userId) => {
-  const q = query(
-    collection(db, COLLECTIONS.KENCLENG),
-    where('userId', '==', userId),
-    orderBy('createdAt', 'desc')
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.KENCLENG),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error getting kencleng by user:', error);
+    return [];
+  }
 };
 
 export const getKenclengById = async (id) => {
-  const snap = await getDoc(doc(db, COLLECTIONS.KENCLENG, id));
-  if (!snap.exists()) return null;
-  return { id: snap.id, ...snap.data() };
+  if (!db) return null;
+  try {
+    const snap = await getDoc(doc(db, COLLECTIONS.KENCLENG, id));
+    if (!snap.exists()) return null;
+    return { id: snap.id, ...snap.data() };
+  } catch (error) {
+    console.error('Error getting kencleng by id:', error);
+    return null;
+  }
 };
 
 export const getAllKencleng = async () => {
-  const q = query(collection(db, COLLECTIONS.KENCLENG), orderBy('createdAt', 'desc'));
-  const snap = await getDocs(q);
-  const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-  // Sort by saldo client-side to avoid composite index requirement
-  return data.sort((a, b) => (b.saldo || 0) - (a.saldo || 0));
+  if (!db) return [];
+  try {
+    const q = query(collection(db, COLLECTIONS.KENCLENG), orderBy('createdAt', 'desc'));
+    const snap = await getDocs(q);
+    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    return data.sort((a, b) => (b.saldo || 0) - (a.saldo || 0));
+  } catch (error) {
+    console.error('Error getting all kencleng:', error);
+    return [];
+  }
 };
 
 export const updateKenclengStatus = async (id, status) => {
+  if (!db) throw new Error('Firestore not initialized');
   await updateDoc(doc(db, COLLECTIONS.KENCLENG, id), {
     status,
     updatedAt: serverTimestamp(),
@@ -65,19 +84,26 @@ export const updateKenclengStatus = async (id, status) => {
 };
 
 export const subscribeKencleng = (userId, callback) => {
-  const q = query(
-    collection(db, COLLECTIONS.KENCLENG),
-    where('userId', '==', userId)
-  );
-  return onSnapshot(q, (snap) => {
-    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    callback(data);
-  });
+  if (!db) return () => {};
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.KENCLENG),
+      where('userId', '==', userId)
+    );
+    return onSnapshot(q, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(data);
+    });
+  } catch (error) {
+    console.error('Error subscribing to kencleng:', error);
+    return () => {};
+  }
 };
 
 // ── Setoran ───────────────────────────────────────────────────────────────────
 
 export const createSetoran = async ({ kenclengId, userId, nominal, catatan, inputBy }) => {
+  if (!db) throw new Error('Firestore not initialized');
   const data = {
     kenclengId,
     userId,
@@ -93,6 +119,7 @@ export const createSetoran = async ({ kenclengId, userId, nominal, catatan, inpu
 };
 
 export const approveSetoran = async (setoranId, kenclengId, nominal) => {
+  if (!db) throw new Error('Firestore not initialized');
   await updateDoc(doc(db, COLLECTIONS.SETORAN, setoranId), {
     status: STATUS_SETORAN.DITERIMA,
     updatedAt: serverTimestamp(),
@@ -104,6 +131,7 @@ export const approveSetoran = async (setoranId, kenclengId, nominal) => {
 };
 
 export const rejectSetoran = async (setoranId, alasan) => {
+  if (!db) throw new Error('Firestore not initialized');
   await updateDoc(doc(db, COLLECTIONS.SETORAN, setoranId), {
     status: STATUS_SETORAN.DITOLAK,
     alasanDitolak: alasan || '',
@@ -112,49 +140,72 @@ export const rejectSetoran = async (setoranId, alasan) => {
 };
 
 export const getRiwayatSetoran = async (kenclengId) => {
-  const q = query(
-    collection(db, COLLECTIONS.SETORAN),
-    where('kenclengId', '==', kenclengId),
-    orderBy('createdAt', 'desc'),
-    limit(50)
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('kenclengId', '==', kenclengId),
+      orderBy('createdAt', 'desc'),
+      limit(50)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error getting riwayat setoran:', error);
+    return [];
+  }
 };
 
 export const getPendingSetoran = async () => {
-  const q = query(
-    collection(db, COLLECTIONS.SETORAN),
-    where('status', '==', STATUS_SETORAN.PENDING),
-    orderBy('createdAt', 'asc')
-  );
-  const snap = await getDocs(q);
-  return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('status', '==', STATUS_SETORAN.PENDING),
+      orderBy('createdAt', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error getting pending setoran:', error);
+    return [];
+  }
 };
 
 export const subscribeSetoran = (kenclengId, callback) => {
-  const q = query(
-    collection(db, COLLECTIONS.SETORAN),
-    where('kenclengId', '==', kenclengId),
-    orderBy('createdAt', 'desc'),
-    limit(20)
-  );
-  return onSnapshot(q, (snap) => {
-    const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
-    callback(data);
-  });
+  if (!db) return () => {};
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.SETORAN),
+      where('kenclengId', '==', kenclengId),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
+    return onSnapshot(q, (snap) => {
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+      callback(data);
+    });
+  } catch (error) {
+    console.error('Error subscribing to setoran:', error);
+    return () => {};
+  }
 };
 
 export const getLeaderboard = async () => {
-  // Simple query - filter nonaktif client-side to avoid requiring composite index
-  const q = query(
-    collection(db, COLLECTIONS.KENCLENG),
-    orderBy('saldo', 'desc'),
-    limit(30)
-  );
-  const snap = await getDocs(q);
-  return snap.docs
-    .map((d) => ({ id: d.id, ...d.data() }))
-    .filter((k) => k.status !== 'nonaktif')
-    .slice(0, 20);
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.KENCLENG),
+      orderBy('saldo', 'desc'),
+      limit(30)
+    );
+    const snap = await getDocs(q);
+    return snap.docs
+      .map((d) => ({ id: d.id, ...d.data() }))
+      .filter((k) => k.status !== 'nonaktif')
+      .slice(0, 20);
+  } catch (error) {
+    console.error('Error getting leaderboard:', error);
+    return [];
+  }
 };

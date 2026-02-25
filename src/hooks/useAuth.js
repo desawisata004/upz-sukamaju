@@ -10,17 +10,38 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsub = onAuthChange(async (firebaseUser) => {
-      setUser(firebaseUser);
-      if (firebaseUser) {
-        const data = await getUserData(firebaseUser.uid);
-        setUserData(data);
-      } else {
-        setUserData(null);
+    let unsub = () => {};
+    
+    const initAuth = async () => {
+      try {
+        unsub = await onAuthChange(async (firebaseUser) => {
+          setUser(firebaseUser);
+          if (firebaseUser) {
+            try {
+              const data = await getUserData(firebaseUser.uid);
+              setUserData(data);
+            } catch (error) {
+              console.error('Error fetching user data:', error);
+              setUserData(null);
+            }
+          } else {
+            setUserData(null);
+          }
+          setLoading(false);
+        });
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        setLoading(false);
       }
-      setLoading(false);
-    });
-    return unsub;
+    };
+
+    initAuth();
+    
+    return () => {
+      if (typeof unsub === 'function') {
+        unsub();
+      }
+    };
   }, []);
 
   return (

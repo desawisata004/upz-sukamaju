@@ -6,18 +6,18 @@ import { LoadingPage } from './components/common/Loading';
 import { ROLES, ROUTES } from './config/constants';
 import './styles/globals.css';
 
-// Lazy loaded pages
-const LoginPage = lazy(() => import('./pages/login'));
-const HomePage = lazy(() => import('./pages/index'));
-const RTDashboard = lazy(() => import('./pages/rt/dashboard'));
-const RTSetoran = lazy(() => import('./pages/rt/setoran'));
-const AdminDashboard = lazy(() => import('./pages/admin/dashboard'));
-const AdminKelola = lazy(() => import('./pages/admin/kelola-kencleng'));
-const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
-const ScanPage = lazy(() => import('./pages/ScanPage'));
-const RiwayatPage = lazy(() => import('./pages/RiwayatPage'));
-const ProfilPage = lazy(() => import('./pages/ProfilPage'));
-const KenclengDetailPage = lazy(() => import('./pages/KenclengDetailPage'));
+// Lazy loaded pages dengan error handling
+const LoginPage = lazy(() => import('./pages/login').catch(() => ({ default: () => <div>Error loading page</div> })));
+const HomePage = lazy(() => import('./pages/index').catch(() => ({ default: () => <div>Error loading page</div> })));
+const RTDashboard = lazy(() => import('./pages/rt/dashboard').catch(() => ({ default: () => <div>Error loading page</div> })));
+const RTSetoran = lazy(() => import('./pages/rt/setoran').catch(() => ({ default: () => <div>Error loading page</div> })));
+const AdminDashboard = lazy(() => import('./pages/admin/dashboard').catch(() => ({ default: () => <div>Error loading page</div> })));
+const AdminKelola = lazy(() => import('./pages/admin/kelola-kencleng').catch(() => ({ default: () => <div>Error loading page</div> })));
+const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage').catch(() => ({ default: () => <div>Error loading page</div> })));
+const ScanPage = lazy(() => import('./pages/ScanPage').catch(() => ({ default: () => <div>Error loading page</div> })));
+const RiwayatPage = lazy(() => import('./pages/RiwayatPage').catch(() => ({ default: () => <div>Error loading page</div> })));
+const ProfilPage = lazy(() => import('./pages/ProfilPage').catch(() => ({ default: () => <div>Error loading page</div> })));
+const KenclengDetailPage = lazy(() => import('./pages/KenclengDetailPage').catch(() => ({ default: () => <div>Error loading page</div> })));
 
 // Route guards
 const ProtectedRoute = ({ children, roles }) => {

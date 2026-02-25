@@ -7,12 +7,28 @@ export const useRealtimeKencleng = (userId) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!userId) return;
-    const unsub = subscribeKencleng(userId, (items) => {
-      setData(items);
+    if (!userId) {
       setLoading(false);
-    });
-    return unsub;
+      return;
+    }
+    
+    let unsubscribe = () => {};
+    
+    try {
+      unsubscribe = subscribeKencleng(userId, (items) => {
+        setData(items);
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error('Error in useRealtimeKencleng:', error);
+      setLoading(false);
+    }
+    
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [userId]);
 
   return { data, loading };
@@ -23,12 +39,28 @@ export const useRealtimeSetoran = (kenclengId) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!kenclengId) return;
-    const unsub = subscribeSetoran(kenclengId, (items) => {
-      setData(items);
+    if (!kenclengId) {
       setLoading(false);
-    });
-    return unsub;
+      return;
+    }
+    
+    let unsubscribe = () => {};
+    
+    try {
+      unsubscribe = subscribeSetoran(kenclengId, (items) => {
+        setData(items);
+        setLoading(false);
+      });
+    } catch (error) {
+      console.error('Error in useRealtimeSetoran:', error);
+      setLoading(false);
+    }
+    
+    return () => {
+      if (typeof unsubscribe === 'function') {
+        unsubscribe();
+      }
+    };
   }, [kenclengId]);
 
   return { data, loading };
