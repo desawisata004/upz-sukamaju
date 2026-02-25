@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "engines": {
-    "node": "20.x"  // atau bisa pakai "22.x" atau "24.x"
+    "node": "20.x"
   },
   "dependencies": {
     "react": "^18.2.0",
