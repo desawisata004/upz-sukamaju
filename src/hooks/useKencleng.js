@@ -1,117 +1,46 @@
-import { useState } from 'react';
-import kenclengService from '@/services/kenclengService';
-import { toast } from 'react-hot-toast';
+import { useState, useEffect } from 'react';
+import { getKenclengByUser } from '../services/kenclengService';
+import { STATUS_KENCLENG } from '../config/constants';
 
-export const useKencleng = () => {
-  const [loading, setLoading] = useState(false);
+export const useKencleng = (userId) => {
+  const [kenclengList, setKenclengList] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const getKenclengById = async (id) => {
+  const refresh = async () => {
+    if (!userId) {
+      setLoading(false);
+      return;
+    }
+    
     setLoading(true);
     try {
-      const data = await kenclengService.getKenclengById(id);
-      return data;
-    } catch (error) {
-      toast.error('Gagal mengambil data kencleng');
-      return null;
+      const data = await getKenclengByUser(userId);
+      setKenclengList(data);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const getRiwayatSetoran = async (kenclengId, limit = 30) => {
-    try {
-      const data = await kenclengService.getRiwayatSetoran(kenclengId, limit);
-      return data;
-    } catch (error) {
-      toast.error('Gagal mengambil riwayat setoran');
-      return [];
-    }
-  };
+  useEffect(() => {
+    refresh();
+  }, [userId]);
 
-  const inputSetoran = async (data) => {
-    setLoading(true);
-    try {
-      const result = await kenclengService.inputSetoran(data);
-      toast.success('Setoran berhasil dicatat');
-      return result;
-    } catch (error) {
-      toast.error('Gagal mencatat setoran');
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
+  const totalSaldo = kenclengList.reduce((acc, k) => acc + (k.saldo || 0), 0);
+  const aktif = kenclengList.filter((k) => k.status === STATUS_KENCLENG.AKTIF);
+  const penuh = kenclengList.filter((k) => (k.saldo || 0) >= (k.target || 0));
 
-  const getLeaderboard = async (rtId, periode) => {
-    try {
-      const data = await kenclengService.getLeaderboard(rtId, periode);
-      return data;
-    } catch (error) {
-      toast.error('Gagal mengambil leaderboard');
-      return [];
-    }
-  };
-
-  const getRtStats = async (rtId) => {
-    try {
-      const data = await kenclengService.getRtStats(rtId);
-      return data;
-    } catch (error) {
-      toast.error('Gagal mengambil statistik RT');
-      return {
-        totalKencleng: 0,
-        aktif: 0,
-        totalSetoran: 0,
-        targetBulanan: 0,
-        realisasi: 0,
-        setoranHariIni: []
-      };
-    }
-  };
-
-  const calculateStats = (riwayat) => {
-    const now = new Date();
-    const currentMonth = now.getMonth();
-    const currentYear = now.getFullYear();
-    const currentWeek = getWeekNumber(now);
-    
-    let total = 0;
-    let bulanIni = 0;
-    let mingguIni = 0;
-    
-    riwayat.forEach(item => {
-      const jumlah = item.jumlah || 0;
-      total += jumlah;
-      
-      const date = item.tanggal?.toDate();
-      if (date) {
-        if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-          bulanIni += jumlah;
-          
-          if (getWeekNumber(date) === currentWeek) {
-            mingguIni += jumlah;
-          }
-        }
-      }
-    });
-    
-    return { total, bulanIni, mingguIni };
-  };
-
-  // Helper function untuk mendapatkan nomor minggu
-  const getWeekNumber = (date) => {
-    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-    const pastDaysOfYear = (date - firstDayOfYear) / 86400000;
-    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-  };
-
-  return {
-    loading,
-    getKenclengById,
-    getRiwayatSetoran,
-    inputSetoran,
-    getLeaderboard,
-    getRtStats,
-    calculateStats
+  return { 
+    kenclengList, 
+    loading, 
+    error, 
+    refresh, 
+    totalSaldo, 
+    aktif,
+    penuh,
+    count: kenclengList.length
   };
 };

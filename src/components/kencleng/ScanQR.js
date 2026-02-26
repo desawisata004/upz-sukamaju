@@ -1,119 +1,189 @@
-import React, { useState, useEffect } from 'react';
-import { Camera, X, Upload } from 'lucide-react';
-import { Html5QrcodeScanner } from 'html5-qrcode';
+import React, { useEffect, useRef, useState } from 'react';
+import { Html5Qrcode } from 'html5-qrcode';
+import { validateQRData } from '../../utils/validator';
 import Button from '../common/Button';
 import Alert from '../common/Alert';
-import Modal from '../common/Modal';
 
-const ScanQR = ({ onScanSuccess, onClose }) => {
-  const [scanning, setScanning] = useState(true);
-  const [manualId, setManualId] = useState('');
+const ScanQR = ({ onScanSuccess, onCancel }) => {
+  const [scanning, setScanning] = useState(false);
   const [error, setError] = useState('');
+  const [permissionDenied, setPermissionDenied] = useState(false);
+  const html5QrCodeRef = useRef(null);
+
+  const startScanner = async () => {
+    setError('');
+    setScanning(true);
+
+    try {
+      html5QrCodeRef.current = new Html5Qrcode('qr-reader');
+      
+      await html5QrCodeRef.current.start(
+        { facingMode: 'environment' },
+        { 
+          fps: 10, 
+          qrbox: { width: 250, height: 250 },
+          aspectRatio: 1
+        },
+        (decodedText) => {
+          const data = validateQRData(decodedText);
+          if (data) {
+            stopScanner();
+            onScanSuccess(data);
+          } else {
+            setError('QR Code tidak valid. Pastikan QR dari Kencleng Digital.');
+          }
+        },
+        () => {}
+      );
+    } catch (err) {
+      setScanning(false);
+      if (err.toString().includes('permission')) {
+        setPermissionDenied(true);
+        setError('Akses kamera ditolak. Izinkan akses kamera di pengaturan browser.');
+      } else {
+        setError('Gagal memulai kamera: ' + err.toString());
+      }
+    }
+  };
+
+  const stopScanner = async () => {
+    if (html5QrCodeRef.current) {
+      try {
+        await html5QrCodeRef.current.stop();
+        await html5QrCodeRef.current.clear();
+      } catch (e) {}
+      html5QrCodeRef.current = null;
+    }
+    setScanning(false);
+  };
 
   useEffect(() => {
-    if (scanning) {
-      const scanner = new Html5QrcodeScanner('qr-reader', {
-        qrbox: {
-          width: 250,
-          height: 250,
-        },
-        fps: 5,
-        rememberLastUsedCamera: true,
-        showTorchButtonIfSupported: true,
-      });
-
-      scanner.render(onScanDetected, onScanError);
-
-      return () => {
-        scanner.clear();
-      };
-    }
-  }, [scanning]);
-
-  const onScanDetected = (decodedText) => {
-    onScanSuccess(decodedText);
-  };
-
-  const onScanError = (error) => {
-    console.warn('Scan error:', error);
-  };
-
-  const handleManualSubmit = () => {
-    if (manualId.trim()) {
-      onScanSuccess(manualId.trim());
-    } else {
-      setError('Masukkan ID Kencleng');
-    }
-  };
+    return () => { 
+      if (html5QrCodeRef.current) {
+        stopScanner();
+      }
+    };
+  }, []);
 
   return (
-    <Modal isOpen={true} onClose={onClose} title="Scan QR Kencleng">
-      {scanning ? (
-        <div className="space-y-4">
-          <div id="qr-reader" className="w-full" />
-          
-          <p className="text-center text-sm text-gray-500">
-            Arahkan kamera ke QR Code kencleng Anda
-          </p>
-
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              onClick={() => setScanning(false)}
-              className="flex-1"
-              icon={<Upload size={20} />}
-            >
-              Input Manual
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => window.location.reload()}
-              className="flex-1"
-              icon={<Camera size={20} />}
-            >
-              Ganti Kamera
-            </Button>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div
+        style={{
+          background: 'var(--hitam)',
+          borderRadius: 'var(--radius-xl)',
+          overflow: 'hidden',
+          aspectRatio: '1',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          minHeight: 280,
+        }}
+      >
+        {!scanning && (
+          <div style={{ textAlign: 'center', color: 'var(--abu-300)', padding: 24 }}>
+            <div style={{ fontSize: '4rem', marginBottom: 12, opacity: 0.5 }}>📷</div>
+            <p style={{ fontSize: '0.9rem' }}>Tekan tombol di bawah untuk mulai scan QR</p>
           </div>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-2">
-              ID Kencleng
-            </label>
-            <input
-              type="text"
-              value={manualId}
-              onChange={(e) => setManualId(e.target.value)}
-              placeholder="Contoh: KCLG-01-001"
-              className="w-full px-4 py-3 border rounded-lg text-lg"
-              autoFocus
-            />
-          </div>
+        )}
 
-          {error && <Alert type="error" message={error} />}
+        <div
+          id="qr-reader"
+          style={{
+            width: '100%',
+            height: '100%',
+            position: 'absolute',
+            inset: 0,
+          }}
+        />
 
-          <div className="flex gap-2">
-            <Button
-              variant="primary"
-              onClick={handleManualSubmit}
-              className="flex-1"
-            >
-              Lanjutkan
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => {
-                setScanning(true);
-                setError('');
+        {scanning && (
+          <div
+            style={{
+              position: 'absolute',
+              inset: 0,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              pointerEvents: 'none',
+            }}
+          >
+            <div
+              style={{
+                width: 220,
+                height: 220,
+                border: '2px solid var(--hijau)',
+                borderRadius: 'var(--radius-lg)',
+                boxShadow: '0 0 0 4000px rgba(0,0,0,0.4)',
+                position: 'relative',
               }}
             >
-              <Camera size={20} />
-            </Button>
+              {['topLeft','topRight','bottomLeft','bottomRight'].map((pos) => (
+                <span
+                  key={pos}
+                  style={{
+                    position: 'absolute',
+                    width: 20,
+                    height: 20,
+                    borderColor: 'var(--hijau-muda)',
+                    borderStyle: 'solid',
+                    borderWidth: 0,
+                    ...(pos === 'topLeft' ? { top: -2, left: -2, borderTopWidth: 3, borderLeftWidth: 3 } : {}),
+                    ...(pos === 'topRight' ? { top: -2, right: -2, borderTopWidth: 3, borderRightWidth: 3 } : {}),
+                    ...(pos === 'bottomLeft' ? { bottom: -2, left: -2, borderBottomWidth: 3, borderLeftWidth: 3 } : {}),
+                    ...(pos === 'bottomRight' ? { bottom: -2, right: -2, borderBottomWidth: 3, borderRightWidth: 3 } : {}),
+                  }}
+                />
+              ))}
+
+              <div
+                style={{
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: 'var(--hijau)',
+                  animation: 'scanLine 1.5s ease-in-out infinite',
+                  boxShadow: '0 0 8px var(--hijau)',
+                }}
+              />
+            </div>
           </div>
-        </div>
+        )}
+      </div>
+
+      {error && <Alert type="error" message={error} onClose={() => setError('')} />}
+      {permissionDenied && (
+        <Alert
+          type="warning"
+          message="Coba refresh halaman dan izinkan akses kamera, atau masukkan data secara manual."
+        />
       )}
-    </Modal>
+
+      <div style={{ display: 'flex', gap: 12 }}>
+        {!scanning ? (
+          <Button fullWidth onClick={startScanner} icon="📷">
+            Mulai Scan QR
+          </Button>
+        ) : (
+          <Button fullWidth variant="ghost" onClick={stopScanner}>
+            Hentikan Scan
+          </Button>
+        )}
+        {onCancel && (
+          <Button variant="ghost" onClick={onCancel} style={{ flexShrink: 0 }}>
+            Batal
+          </Button>
+        )}
+      </div>
+
+      <style>{`
+        @keyframes scanLine {
+          0%, 100% { top: 0; }
+          50% { top: calc(100% - 2px); }
+        }
+      `}</style>
+    </div>
   );
 };
 
