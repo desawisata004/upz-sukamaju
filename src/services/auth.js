@@ -11,17 +11,27 @@ import {
   updateDoc, 
   serverTimestamp 
 } from 'firebase/firestore';
-import { auth, db } from './firebase';
+import { auth, db, isFirebaseReady, initializationError } from './firebase';
+
+// Helper untuk cek Firebase
+const checkFirebase = () => {
+  if (!isFirebaseReady()) {
+    console.error('Firebase not ready:', initializationError);
+    throw new Error('Firebase tidak tersedia. Periksa koneksi internet dan konfigurasi.');
+  }
+  return true;
+};
 
 export const loginWithEmail = async (email, password) => {
-  if (!auth) throw new Error('Firebase Auth tidak tersedia');
-  
   try {
+    checkFirebase();
+    
     const result = await signInWithEmailAndPassword(auth, email, password);
     return result.user;
   } catch (error) {
     console.error('Login error:', error);
     
+    // Handle specific error codes
     if (error.code === 'auth/user-not-found') {
       throw new Error('Email tidak terdaftar');
     } else if (error.code === 'auth/wrong-password') {
@@ -32,6 +42,8 @@ export const loginWithEmail = async (email, password) => {
       throw new Error('Terlalu banyak percobaan. Coba lagi nanti');
     } else if (error.code === 'auth/network-request-failed') {
       throw new Error('Koneksi internet bermasalah');
+    } else if (error.code === 'auth/invalid-credential') {
+      throw new Error('Email atau password salah');
     } else {
       throw new Error(`Gagal login: ${error.message}`);
     }
@@ -39,8 +51,8 @@ export const loginWithEmail = async (email, password) => {
 };
 
 export const logout = async () => {
-  if (!auth) return;
   try {
+    if (!auth) return;
     await signOut(auth);
   } catch (error) {
     console.error('Logout error:', error);
@@ -48,22 +60,24 @@ export const logout = async () => {
 };
 
 export const getUserData = async (uid) => {
-  if (!db) return null;
-  
   try {
+    if (!db) return null;
+    
     const docRef = doc(db, 'users', uid);
     const snap = await getDoc(docRef);
     if (snap.exists()) {
-      return { id: snap.id, ...snap.data() };
+      return { uid: snap.id, ...snap.data() };
     }
+    return null;
   } catch (error) {
     console.error('Error getting user data:', error);
+    return null;
   }
-  return null;
 };
 
 export const onAuthChange = (callback) => {
   if (!auth) {
+    console.warn('Auth not initialized, sending null user');
     callback(null);
     return () => {};
   }
@@ -78,13 +92,13 @@ export const onAuthChange = (callback) => {
 };
 
 export const registerUser = async ({ email, password, nama, noHp, alamat, role = 'warga' }) => {
-  if (!auth) throw new Error('Firebase Auth tidak tersedia');
-
   try {
+    checkFirebase();
+    
     const result = await createUserWithEmailAndPassword(auth, email, password);
     const uid = result.user.uid;
 
-    await setDoc(doc(db, 'users', uid), {
+    const userData = {
       uid,
       nama: nama.trim(),
       email: email.toLowerCase().trim(),
@@ -92,23 +106,41 @@ export const registerUser = async ({ email, password, nama, noHp, alamat, role =
       alamat: alamat || '',
       role,
       createdAt: serverTimestamp(),
-    });
+      updatedAt: serverTimestamp(),
+    };
 
+    await setDoc(doc(db, 'users', uid), userData);
+    
     return result.user;
   } catch (error) {
-    if (error.code === 'auth/email-already-in-use') throw new Error('Email sudah terdaftar');
-    if (error.code === 'auth/weak-password') throw new Error('Password minimal 6 karakter');
-    if (error.code === 'auth/invalid-email') throw new Error('Format email tidak valid');
-    throw new Error('Gagal mendaftar: ' + error.message);
+    console.error('Register error:', error);
+    
+    if (error.code === 'auth/email-already-in-use') {
+      throw new Error('Email sudah terdaftar');
+    } else if (error.code === 'auth/weak-password') {
+      throw new Error('Password minimal 6 karakter');
+    } else if (error.code === 'auth/invalid-email') {
+      throw new Error('Format email tidak valid');
+    } else if (error.code === 'auth/network-request-failed') {
+      throw new Error('Koneksi internet bermasalah');
+    } else {
+      throw new Error('Gagal mendaftar: ' + error.message);
+    }
   }
 };
 
 export const updateUserProfile = async (uid, { nama, noHp, alamat }) => {
-  if (!db) throw new Error('Firestore not initialized');
-  await updateDoc(doc(db, 'users', uid), {
-    nama: nama.trim(),
-    noHp: noHp || '',
-    alamat: alamat || '',
-    updatedAt: serverTimestamp(),
-  });
+  try {
+    checkFirebase();
+    
+    await updateDoc(doc(db, 'users', uid), {
+      nama: nama.trim(),
+      noHp: noHp || '',
+      alamat: alamat || '',
+      updatedAt: serverTimestamp(),
+    });
+  } catch (error) {
+    console.error('Update profile error:', error);
+    throw new Error('Gagal update profil: ' + error.message);
+  }
 };
