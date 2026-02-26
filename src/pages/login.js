@@ -10,12 +10,11 @@ const InputField = ({ label, type = 'text', value, onChange, placeholder, requir
   <div style={{ marginBottom: 16 }}>
     <label style={{ 
       display: 'block', 
-      fontSize: '0.78rem', 
-      fontWeight: 700, 
-      color: error ? 'var(--danger)' : 'var(--abu-500)', 
-      marginBottom: 6, 
-      textTransform: 'uppercase', 
-      letterSpacing: '0.05em' 
+      fontSize: '0.75rem', 
+      fontWeight: 600, 
+      color: error ? 'var(--danger)' : 'var(--abu-600)', 
+      marginBottom: 4,
+      letterSpacing: '0.3px'
     }}>
       {label} {required && <span style={{ color: 'var(--danger)' }}>*</span>}
     </label>
@@ -26,17 +25,25 @@ const InputField = ({ label, type = 'text', value, onChange, placeholder, requir
       placeholder={placeholder}
       style={{ 
         width: '100%', 
-        padding: '13px 16px', 
+        padding: '12px 14px', 
         border: `1.5px solid ${error ? 'var(--danger)' : 'var(--abu-200)'}`, 
-        borderRadius: 'var(--radius-md)', 
-        fontSize: '1rem', 
+        borderRadius: '12px', 
+        fontSize: '0.95rem', 
         fontFamily: 'var(--font-body)', 
         background: '#fff', 
         color: 'var(--hitam)', 
-        transition: 'border-color 0.2s' 
+        transition: 'all 0.2s',
+        outline: 'none',
+        boxShadow: error ? '0 0 0 3px rgba(192, 57, 43, 0.1)' : 'none'
       }}
-      onFocus={e => e.target.style.borderColor = error ? 'var(--danger)' : 'var(--hijau)'}
-      onBlur={e => e.target.style.borderColor = error ? 'var(--danger)' : 'var(--abu-200)'}
+      onFocus={e => {
+        e.target.style.borderColor = error ? 'var(--danger)' : 'var(--hijau)';
+        e.target.style.boxShadow = `0 0 0 3px ${error ? 'rgba(192, 57, 43, 0.1)' : 'rgba(26, 107, 60, 0.1)'}`;
+      }}
+      onBlur={e => {
+        e.target.style.borderColor = error ? 'var(--danger)' : 'var(--abu-200)';
+        e.target.style.boxShadow = 'none';
+      }}
     />
     {hint && <p style={{ fontSize: '0.7rem', color: 'var(--abu-400)', marginTop: 4 }}>{hint}</p>}
     {error && <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 4 }}>{error}</p>}
@@ -116,8 +123,11 @@ const LoginPage = () => {
     if (!regForm.email.trim()) newErrors.email = 'Email harus diisi';
     else if (!/\S+@\S+\.\S+/.test(regForm.email)) newErrors.email = 'Email tidak valid';
     
-    if (regForm.noHp && !/^[0-9]{10,13}$/.test(regForm.noHp.replace(/\D/g, ''))) {
-      newErrors.noHp = 'Nomor HP tidak valid (10-13 angka)';
+    if (regForm.noHp) {
+      const cleanNoHp = regForm.noHp.replace(/\D/g, '');
+      if (cleanNoHp.length < 10 || cleanNoHp.length > 13) {
+        newErrors.noHp = 'Nomor HP harus 10-13 angka';
+      }
     }
     
     if (!regForm.password) newErrors.password = 'Password harus diisi';
@@ -146,7 +156,7 @@ const LoginPage = () => {
         role: 'warga',
       });
       
-      setAlert({ type: 'success', message: '✅ Akun berhasil dibuat! Mengalihkan...' });
+      setAlert({ type: 'success', message: '✅ Akun berhasil dibuat! Silakan login.' });
       
       // Reset form
       setRegForm({
@@ -179,72 +189,112 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="app-layout" style={{ minHeight: '100vh', background: 'var(--coklat-pale)' }}>
+    <div style={{
+      minHeight: '100vh',
+      background: 'linear-gradient(145deg, var(--coklat-pale) 0%, #fff 100%)',
+      display: 'flex',
+      flexDirection: 'column'
+    }}>
       {/* Hero Header */}
       <div style={{ 
-        background: 'linear-gradient(160deg, var(--hijau) 0%, var(--coklat) 100%)', 
-        padding: '40px 24px 60px', 
+        background: 'linear-gradient(145deg, var(--hijau) 0%, #2d5a3c 100%)', 
+        padding: '48px 24px 64px', 
         textAlign: 'center', 
         position: 'relative', 
-        overflow: 'hidden' 
+        overflow: 'hidden',
+        borderBottomLeftRadius: '30px',
+        borderBottomRightRadius: '30px',
       }}>
+        {/* Decorative circles */}
         <div style={{ 
           position: 'absolute', 
           top: -30, 
           right: -30, 
-          width: 120, 
-          height: 120, 
+          width: 160, 
+          height: 160, 
           borderRadius: '50%', 
-          background: 'rgba(255,255,255,0.06)' 
+          background: 'rgba(255,255,255,0.05)',
+          zIndex: 1
         }} />
         <div style={{ 
           position: 'absolute', 
-          bottom: -40, 
+          bottom: -50, 
           left: -20, 
-          width: 100, 
-          height: 100, 
+          width: 140, 
+          height: 140, 
           borderRadius: '50%', 
-          background: 'rgba(255,255,255,0.04)' 
+          background: 'rgba(255,255,255,0.03)',
+          zIndex: 1
         }} />
         
-        <div style={{ fontSize: '3rem', marginBottom: 10 }}>🪣</div>
-        <h1 style={{ 
-          fontFamily: 'var(--font-display)', 
-          fontSize: '1.8rem', 
-          color: '#fff', 
-          fontStyle: 'italic', 
-          marginBottom: 6 
-        }}>
-          {APP_NAME}
-        </h1>
-        <p style={{ fontSize: '0.85rem', color: 'rgba(255,255,255,0.7)' }}>{RT_NAME}</p>
+        <div style={{ position: 'relative', zIndex: 2 }}>
+          <div style={{ 
+            fontSize: '4rem', 
+            marginBottom: 12,
+            filter: 'drop-shadow(0 8px 12px rgba(0,0,0,0.2))'
+          }}>
+            🪣
+          </div>
+          <h1 style={{ 
+            fontFamily: 'var(--font-display)', 
+            fontSize: '2.2rem', 
+            color: '#fff', 
+            fontStyle: 'italic', 
+            marginBottom: 8,
+            textShadow: '0 2px 4px rgba(0,0,0,0.2)'
+          }}>
+            {APP_NAME}
+          </h1>
+          <p style={{ 
+            fontSize: '0.9rem', 
+            color: 'rgba(255,255,255,0.8)',
+            fontWeight: 500
+          }}>
+            {RT_NAME}
+          </p>
+        </div>
       </div>
 
       {/* Form Card */}
-      <div style={{ padding: '0 20px', marginTop: -24, paddingBottom: 40 }}>
+      <div style={{ 
+        padding: '0 20px', 
+        marginTop: -32, 
+        paddingBottom: 40,
+        flex: 1,
+        position: 'relative',
+        zIndex: 10
+      }}>
         <div style={{ 
           background: '#fff', 
-          borderRadius: 'var(--radius-xl)', 
-          boxShadow: 'var(--shadow-lg)', 
-          overflow: 'hidden' 
+          borderRadius: '28px', 
+          boxShadow: '0 20px 40px rgba(0,0,0,0.08), 0 8px 16px rgba(0,0,0,0.06)', 
+          overflow: 'hidden',
+          backdropFilter: 'blur(10px)',
+          border: '1px solid rgba(255,255,255,0.5)'
         }}>
           {/* Tab Navigation */}
-          <div style={{ display: 'flex', borderBottom: '1px solid var(--abu-100)' }}>
+          <div style={{ 
+            display: 'flex', 
+            padding: '8px 8px 0 8px',
+            background: 'var(--abu-50)',
+            borderBottom: '1px solid var(--abu-100)'
+          }}>
             <button 
               onClick={() => { setTab('login'); setAlert(null); }}
               style={{ 
                 flex: 1, 
-                padding: '16px', 
+                padding: '14px 16px', 
                 background: 'none', 
                 border: 'none', 
                 fontFamily: 'var(--font-body)', 
-                fontWeight: 700, 
+                fontWeight: 600, 
                 fontSize: '0.95rem', 
                 color: tab === 'login' ? 'var(--hijau)' : 'var(--abu-400)', 
                 cursor: 'pointer', 
-                borderBottom: `2.5px solid ${tab === 'login' ? 'var(--hijau)' : 'transparent'}`, 
-                transition: 'all 0.2s', 
-                marginBottom: -1 
+                borderBottom: `3px solid ${tab === 'login' ? 'var(--hijau)' : 'transparent'}`, 
+                transition: 'all 0.2s',
+                marginBottom: -1,
+                borderRadius: '12px 12px 0 0'
               }}
             >
               Masuk
@@ -253,35 +303,40 @@ const LoginPage = () => {
               onClick={() => { setTab('daftar'); setAlert(null); }}
               style={{ 
                 flex: 1, 
-                padding: '16px', 
+                padding: '14px 16px', 
                 background: 'none', 
                 border: 'none', 
                 fontFamily: 'var(--font-body)', 
-                fontWeight: 700, 
+                fontWeight: 600, 
                 fontSize: '0.95rem', 
                 color: tab === 'daftar' ? 'var(--hijau)' : 'var(--abu-400)', 
                 cursor: 'pointer', 
-                borderBottom: `2.5px solid ${tab === 'daftar' ? 'var(--hijau)' : 'transparent'}`, 
-                transition: 'all 0.2s', 
-                marginBottom: -1 
+                borderBottom: `3px solid ${tab === 'daftar' ? 'var(--hijau)' : 'transparent'}`, 
+                transition: 'all 0.2s',
+                marginBottom: -1,
+                borderRadius: '12px 12px 0 0'
               }}
             >
               Daftar
             </button>
           </div>
 
-          <div style={{ padding: '24px 20px 28px' }}>
-            {alert && <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} autoClose={5000} />}
+          <div style={{ padding: '28px 24px 32px' }}>
+            {alert && (
+              <div style={{ marginBottom: 20 }}>
+                <Alert type={alert.type} message={alert.message} onClose={() => setAlert(null)} autoClose={5000} />
+              </div>
+            )}
 
             {/* LOGIN TAB */}
             {tab === 'login' && (
-              <form onSubmit={handleLogin} style={{ animation: 'fadeIn 0.25s ease' }}>
+              <form onSubmit={handleLogin} style={{ animation: 'fadeIn 0.3s ease' }}>
                 <InputField 
                   label="Email" 
                   type="email" 
                   value={email} 
                   onChange={setEmail} 
-                  placeholder="email@contoh.com" 
+                  placeholder="contoh@email.com" 
                   required 
                   error={errors.email}
                 />
@@ -289,12 +344,11 @@ const LoginPage = () => {
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ 
                     display: 'block', 
-                    fontSize: '0.78rem', 
-                    fontWeight: 700, 
-                    color: errors.password ? 'var(--danger)' : 'var(--abu-500)', 
-                    marginBottom: 6, 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.05em' 
+                    fontSize: '0.75rem', 
+                    fontWeight: 600, 
+                    color: errors.password ? 'var(--danger)' : 'var(--abu-600)', 
+                    marginBottom: 4,
+                    letterSpacing: '0.3px'
                   }}>
                     Password <span style={{ color: 'var(--danger)' }}>*</span>
                   </label>
@@ -303,14 +357,25 @@ const LoginPage = () => {
                       type={showPassword ? 'text' : 'password'}
                       value={password}
                       onChange={e => setPassword(e.target.value)}
-                      placeholder="Password Anda"
+                      placeholder="••••••••"
                       style={{ 
                         width: '100%', 
-                        padding: '13px 48px 13px 16px', 
+                        padding: '12px 48px 12px 14px', 
                         border: `1.5px solid ${errors.password ? 'var(--danger)' : 'var(--abu-200)'}`, 
-                        borderRadius: 'var(--radius-md)', 
-                        fontSize: '1rem', 
-                        fontFamily: 'var(--font-body)' 
+                        borderRadius: '12px', 
+                        fontSize: '0.95rem', 
+                        fontFamily: 'var(--font-body)',
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        boxShadow: errors.password ? '0 0 0 3px rgba(192, 57, 43, 0.1)' : 'none'
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = errors.password ? 'var(--danger)' : 'var(--hijau)';
+                        e.target.style.boxShadow = `0 0 0 3px ${errors.password ? 'rgba(192, 57, 43, 0.1)' : 'rgba(26, 107, 60, 0.1)'}`;
+                      }}
+                      onBlur={e => {
+                        e.target.style.borderColor = errors.password ? 'var(--danger)' : 'var(--abu-200)';
+                        e.target.style.boxShadow = 'none';
                       }}
                     />
                     <button 
@@ -324,16 +389,23 @@ const LoginPage = () => {
                         background: 'none', 
                         border: 'none', 
                         cursor: 'pointer', 
-                        fontSize: '1rem', 
+                        fontSize: '1.1rem', 
                         color: 'var(--abu-400)',
-                        padding: '4px'
+                        padding: '8px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '8px',
+                        transition: 'background 0.2s'
                       }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--abu-100)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
                     >
                       {showPassword ? '🙈' : '👁️'}
                     </button>
                   </div>
                   {errors.password && (
-                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 4 }}>{errors.password}</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 6 }}>{errors.password}</p>
                   )}
                 </div>
 
@@ -346,7 +418,7 @@ const LoginPage = () => {
                     background: loading ? 'var(--abu-200)' : 'var(--hijau)', 
                     color: '#fff', 
                     border: 'none', 
-                    borderRadius: 'var(--radius-full)', 
+                    borderRadius: '16px', 
                     fontFamily: 'var(--font-body)', 
                     fontWeight: 700, 
                     fontSize: '1rem', 
@@ -355,13 +427,25 @@ const LoginPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    boxShadow: loading ? 'none' : '0 8px 16px rgba(26, 107, 60, 0.2)',
+                    transform: loading ? 'none' : 'translateY(0)',
+                    marginTop: 8
                   }}
+                  onMouseEnter={e => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseLeave={e => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
                   {loading ? <Spinner size={20} color="#fff" /> : 'Masuk →'}
                 </button>
 
-                <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.82rem', color: 'var(--abu-400)' }}>
+                <p style={{ 
+                  textAlign: 'center', 
+                  marginTop: 20, 
+                  fontSize: '0.85rem', 
+                  color: 'var(--abu-400)',
+                  borderTop: '1px solid var(--abu-100)',
+                  paddingTop: 20
+                }}>
                   Belum punya akun?{' '}
                   <button 
                     type="button"
@@ -373,8 +457,9 @@ const LoginPage = () => {
                       fontWeight: 700, 
                       cursor: 'pointer', 
                       fontFamily: 'var(--font-body)', 
-                      fontSize: '0.82rem',
-                      textDecoration: 'underline'
+                      fontSize: '0.85rem',
+                      textDecoration: 'underline',
+                      padding: '4px 8px'
                     }}
                   >
                     Daftar sekarang
@@ -385,12 +470,12 @@ const LoginPage = () => {
 
             {/* REGISTER TAB */}
             {tab === 'daftar' && (
-              <form onSubmit={handleRegister} style={{ animation: 'fadeIn 0.25s ease' }}>
+              <form onSubmit={handleRegister} style={{ animation: 'fadeIn 0.3s ease' }}>
                 <InputField 
                   label="Nama Lengkap" 
                   value={regForm.nama} 
                   onChange={(v) => updateRegForm('nama', v)} 
-                  placeholder="Nama sesuai KTP" 
+                  placeholder="Masukkan nama lengkap" 
                   required 
                   error={regErrors.nama}
                 />
@@ -400,7 +485,7 @@ const LoginPage = () => {
                   type="email" 
                   value={regForm.email} 
                   onChange={(v) => updateRegForm('email', v)} 
-                  placeholder="email@contoh.com" 
+                  placeholder="contoh@email.com" 
                   required 
                   error={regErrors.email}
                 />
@@ -411,7 +496,7 @@ const LoginPage = () => {
                   value={regForm.noHp} 
                   onChange={(v) => updateRegForm('noHp', v)} 
                   placeholder="081234567890" 
-                  hint="Opsional, minimal 10 angka"
+                  hint="Opsional, 10-13 angka"
                   error={regErrors.noHp}
                 />
                 
@@ -426,12 +511,11 @@ const LoginPage = () => {
                 <div style={{ marginBottom: 16 }}>
                   <label style={{ 
                     display: 'block', 
-                    fontSize: '0.78rem', 
-                    fontWeight: 700, 
-                    color: regErrors.password ? 'var(--danger)' : 'var(--abu-500)', 
-                    marginBottom: 6, 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.05em' 
+                    fontSize: '0.75rem', 
+                    fontWeight: 600, 
+                    color: regErrors.password ? 'var(--danger)' : 'var(--abu-600)', 
+                    marginBottom: 4,
+                    letterSpacing: '0.3px'
                   }}>
                     Password <span style={{ color: 'var(--danger)' }}>*</span>
                   </label>
@@ -443,11 +527,18 @@ const LoginPage = () => {
                       placeholder="Minimal 6 karakter"
                       style={{ 
                         width: '100%', 
-                        padding: '13px 48px 13px 16px', 
+                        padding: '12px 48px 12px 14px', 
                         border: `1.5px solid ${regErrors.password ? 'var(--danger)' : 'var(--abu-200)'}`, 
-                        borderRadius: 'var(--radius-md)', 
-                        fontSize: '1rem', 
-                        fontFamily: 'var(--font-body)' 
+                        borderRadius: '12px', 
+                        fontSize: '0.95rem', 
+                        fontFamily: 'var(--font-body)',
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        boxShadow: regErrors.password ? '0 0 0 3px rgba(192, 57, 43, 0.1)' : 'none'
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = regErrors.password ? 'var(--danger)' : 'var(--hijau)';
+                        e.target.style.boxShadow = `0 0 0 3px ${regErrors.password ? 'rgba(192, 57, 43, 0.1)' : 'rgba(26, 107, 60, 0.1)'}`;
                       }}
                     />
                     <button 
@@ -461,28 +552,30 @@ const LoginPage = () => {
                         background: 'none', 
                         border: 'none', 
                         cursor: 'pointer', 
-                        fontSize: '1rem', 
+                        fontSize: '1.1rem', 
                         color: 'var(--abu-400)',
-                        padding: '4px'
+                        padding: '8px',
+                        borderRadius: '8px'
                       }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--abu-100)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
                     >
                       {showRegPassword ? '🙈' : '👁️'}
                     </button>
                   </div>
                   {regErrors.password && (
-                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 4 }}>{regErrors.password}</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 6 }}>{regErrors.password}</p>
                   )}
                 </div>
 
                 <div style={{ marginBottom: 20 }}>
                   <label style={{ 
                     display: 'block', 
-                    fontSize: '0.78rem', 
-                    fontWeight: 700, 
-                    color: regErrors.confirmPassword ? 'var(--danger)' : 'var(--abu-500)', 
-                    marginBottom: 6, 
-                    textTransform: 'uppercase', 
-                    letterSpacing: '0.05em' 
+                    fontSize: '0.75rem', 
+                    fontWeight: 600, 
+                    color: regErrors.confirmPassword ? 'var(--danger)' : 'var(--abu-600)', 
+                    marginBottom: 4,
+                    letterSpacing: '0.3px'
                   }}>
                     Konfirmasi Password <span style={{ color: 'var(--danger)' }}>*</span>
                   </label>
@@ -494,11 +587,18 @@ const LoginPage = () => {
                       placeholder="Ulangi password"
                       style={{ 
                         width: '100%', 
-                        padding: '13px 48px 13px 16px', 
+                        padding: '12px 48px 12px 14px', 
                         border: `1.5px solid ${regErrors.confirmPassword ? 'var(--danger)' : 'var(--abu-200)'}`, 
-                        borderRadius: 'var(--radius-md)', 
-                        fontSize: '1rem', 
-                        fontFamily: 'var(--font-body)' 
+                        borderRadius: '12px', 
+                        fontSize: '0.95rem', 
+                        fontFamily: 'var(--font-body)',
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        boxShadow: regErrors.confirmPassword ? '0 0 0 3px rgba(192, 57, 43, 0.1)' : 'none'
+                      }}
+                      onFocus={e => {
+                        e.target.style.borderColor = regErrors.confirmPassword ? 'var(--danger)' : 'var(--hijau)';
+                        e.target.style.boxShadow = `0 0 0 3px ${regErrors.confirmPassword ? 'rgba(192, 57, 43, 0.1)' : 'rgba(26, 107, 60, 0.1)'}`;
                       }}
                     />
                     <button 
@@ -512,16 +612,19 @@ const LoginPage = () => {
                         background: 'none', 
                         border: 'none', 
                         cursor: 'pointer', 
-                        fontSize: '1rem', 
+                        fontSize: '1.1rem', 
                         color: 'var(--abu-400)',
-                        padding: '4px'
+                        padding: '8px',
+                        borderRadius: '8px'
                       }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'var(--abu-100)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'none'}
                     >
                       {showRegConfirm ? '🙈' : '👁️'}
                     </button>
                   </div>
                   {regErrors.confirmPassword && (
-                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 4 }}>{regErrors.confirmPassword}</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--danger)', marginTop: 6 }}>{regErrors.confirmPassword}</p>
                   )}
                 </div>
 
@@ -534,7 +637,7 @@ const LoginPage = () => {
                     background: loading ? 'var(--abu-200)' : 'var(--hijau)', 
                     color: '#fff', 
                     border: 'none', 
-                    borderRadius: 'var(--radius-full)', 
+                    borderRadius: '16px', 
                     fontFamily: 'var(--font-body)', 
                     fontWeight: 700, 
                     fontSize: '1rem', 
@@ -543,13 +646,25 @@ const LoginPage = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    gap: '8px'
+                    gap: '8px',
+                    boxShadow: loading ? 'none' : '0 8px 16px rgba(26, 107, 60, 0.2)',
+                    transform: loading ? 'none' : 'translateY(0)',
+                    marginTop: 8
                   }}
+                  onMouseEnter={e => !loading && (e.currentTarget.style.transform = 'translateY(-2px)')}
+                  onMouseLeave={e => !loading && (e.currentTarget.style.transform = 'translateY(0)')}
                 >
                   {loading ? <Spinner size={20} color="#fff" /> : '✅ Daftar Sekarang'}
                 </button>
 
-                <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.82rem', color: 'var(--abu-400)' }}>
+                <p style={{ 
+                  textAlign: 'center', 
+                  marginTop: 20, 
+                  fontSize: '0.85rem', 
+                  color: 'var(--abu-400)',
+                  borderTop: '1px solid var(--abu-100)',
+                  paddingTop: 20
+                }}>
                   Sudah punya akun?{' '}
                   <button 
                     type="button"
@@ -561,8 +676,9 @@ const LoginPage = () => {
                       fontWeight: 700, 
                       cursor: 'pointer', 
                       fontFamily: 'var(--font-body)', 
-                      fontSize: '0.82rem',
-                      textDecoration: 'underline'
+                      fontSize: '0.85rem',
+                      textDecoration: 'underline',
+                      padding: '4px 8px'
                     }}
                   >
                     Masuk
@@ -573,10 +689,29 @@ const LoginPage = () => {
           </div>
         </div>
 
-        <p style={{ textAlign: 'center', fontSize: '0.72rem', color: 'var(--abu-300)', marginTop: 20 }}>
+        <p style={{ 
+          textAlign: 'center', 
+          fontSize: '0.7rem', 
+          color: 'var(--abu-300)', 
+          marginTop: 20,
+          fontWeight: 500
+        }}>
           {APP_NAME} · {RT_NAME}
         </p>
       </div>
+
+      <style>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
     </div>
   );
 };
