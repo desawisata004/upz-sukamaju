@@ -3,6 +3,9 @@ export const DESA_NAME = process.env.REACT_APP_DESA_NAME || 'Desa Sukamaju';
 export const KECAMATAN_NAME = process.env.REACT_APP_KECAMATAN_NAME || 'Kecamatan Sukajaya';
 export const KABUPATEN_NAME = process.env.REACT_APP_KABUPATEN_NAME || 'Kabupaten Sukabumi';
 
+// Tambahkan RT_NAME
+export const RT_NAME = process.env.REACT_APP_RT_NAME || 'RT 01 / RW 02';
+
 export const ROLES = {
   WARGA: 'warga',
   RT: 'rt',
