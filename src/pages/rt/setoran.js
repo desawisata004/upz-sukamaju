@@ -234,6 +234,35 @@ const RTSetoranPage = () => {
       setLoading(false);
     }
   };
+  // Di dalam fungsi handleSubmit di komponen InputManual
+const handleSubmit = async () => {
+  const num = parseInt(nominal.replace(/[^0-9]/g, '') || '0', 10);
+  if (num < 1000) {
+    setAlert({ type: 'error', message: 'Minimal setoran Rp 1.000' });
+    return;
+  }
+
+  setLoading(true);
+  try {
+    await createSetoran({
+      kenclengId: kencleng.id,
+      userId: kencleng.userId,
+      nominal: num,
+      metode: metode,
+      catatan: catatan.trim(),
+      inputBy: userData?.uid || 'rt',
+      foto: foto // base64 atau URL
+    });
+    setAlert({ type: 'success', message: '✅ Setoran berhasil dicatat!' });
+    setTimeout(() => {
+      if (onSuccess) onSuccess();
+    }, 1500);
+  } catch (err) {
+    setAlert({ type: 'error', message: '❌ Gagal: ' + err.message });
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleSetoranSuccess = () => {
     setAlert({ type: 'success', message: '✅ Setoran berhasil dicatat!' });

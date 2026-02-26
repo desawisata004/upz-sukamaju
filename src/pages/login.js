@@ -1,5 +1,5 @@
 // src/pages/login.js — dengan tab Login & Daftar
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { loginWithEmail, registerUser } from '../services/auth';
 import { APP_NAME, RT_NAME, ROLES, ROUTES } from '../config/constants';
@@ -47,21 +47,28 @@ const LoginPage = () => {
   const [alert, setAlert] = useState(null);
 
   // Redirect jika sudah login
-  React.useEffect(() => {
+  useEffect(() => {
     if (userData) {
-      if (userData.role === ROLES.ADMIN) navigate(ROUTES.ADMIN_DASHBOARD, { replace: true });
-      else if (userData.role === ROLES.RT) navigate(ROUTES.RT_DASHBOARD, { replace: true });
-      else navigate(ROUTES.HOME, { replace: true });
+      if (userData.role === ROLES.ADMIN_DESA || userData.role === ROLES.ADMIN) {
+        navigate(ROUTES.ADMIN_DESA_DASHBOARD, { replace: true });
+      } else if (userData.role === ROLES.RT) {
+        navigate(ROUTES.RT_DASHBOARD, { replace: true });
+      } else {
+        navigate(ROUTES.WARGA_PORTAL, { replace: true });
+      }
     }
   }, [userData, navigate]);
 
   const handleLogin = async (e) => {
     e?.preventDefault();
-    if (!email.trim() || !password) { setAlert({ type: 'error', message: 'Email dan password harus diisi.' }); return; }
+    if (!email.trim() || !password) { 
+      setAlert({ type: 'error', message: 'Email dan password harus diisi.' }); 
+      return; 
+    }
     setLoading(true);
     try {
       await loginWithEmail(email.trim(), password);
-      // redirect dihandle useEffect di atas via AuthProvider
+      // redirect akan dihandle oleh useEffect di atas
     } catch (err) {
       setAlert({ type: 'error', message: err.message });
     } finally {
@@ -69,28 +76,54 @@ const LoginPage = () => {
     }
   };
 
-// Update bagian role di register
-const handleDaftar = async (e) => {
-  // ... kode sebelumnya ...
-  await registerUser({
-    email: regEmail.trim(),
-    password: regPassword,
-    nama: regNama.trim(),
-    noHp: regNoHp.trim(),
-    alamat: regAlamat.trim(),
-    role: 'warga', // Default warga
-  });
-  // ... kode selanjutnya ...
-};
+  const handleDaftar = async (e) => {
+    e?.preventDefault();
+    
+    // Validasi
+    if (!regNama.trim()) { 
+      setAlert({ type: 'error', message: 'Nama lengkap harus diisi.' }); 
+      return; 
+    }
+    if (!regEmail.trim()) { 
+      setAlert({ type: 'error', message: 'Email harus diisi.' }); 
+      return; 
+    }
+    if (regPassword.length < 6) { 
+      setAlert({ type: 'error', message: 'Password minimal 6 karakter.' }); 
+      return; 
+    }
+    if (regPassword !== regConfirm) { 
+      setAlert({ type: 'error', message: 'Konfirmasi password tidak cocok.' }); 
+      return; 
+    }
 
-// Update redirect setelah login
-React.useEffect(() => {
-  if (userData) {
-    if (userData.role === ROLES.ADMIN_DESA) navigate(ROUTES.ADMIN_DESA_DASHBOARD, { replace: true });
-    else if (userData.role === ROLES.RT) navigate(ROUTES.RT_DASHBOARD, { replace: true });
-    else navigate(ROUTES.WARGA_PORTAL, { replace: true });
-  }
-}, [userData, navigate]);
+    setLoading(true);
+    try {
+      await registerUser({
+        email: regEmail.trim(),
+        password: regPassword,
+        nama: regNama.trim(),
+        noHp: regNoHp.trim(),
+        alamat: regAlamat.trim(),
+        role: 'warga', // Default warga
+      });
+      setAlert({ type: 'success', message: '✅ Akun berhasil dibuat! Anda akan masuk secara otomatis.' });
+      
+      // Reset form
+      setRegNama('');
+      setRegEmail('');
+      setRegNoHp('');
+      setRegAlamat('');
+      setRegPassword('');
+      setRegConfirm('');
+      
+      // Redirect akan dihandle oleh useEffect
+    } catch (err) {
+      setAlert({ type: 'error', message: err.message });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="app-layout" style={{ minHeight: '100vh', background: 'var(--coklat-pale)' }}>
@@ -110,8 +143,24 @@ React.useEffect(() => {
           {/* Tab switch */}
           <div style={{ display: 'flex', borderBottom: '1px solid var(--abu-100)' }}>
             {[{ id: 'login', label: 'Masuk' }, { id: 'daftar', label: 'Daftar' }].map(t => (
-              <button key={t.id} onClick={() => { setTab(t.id); setAlert(null); }}
-                style={{ flex: 1, padding: '16px', background: 'none', border: 'none', fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '0.95rem', color: tab === t.id ? 'var(--hijau)' : 'var(--abu-400)', cursor: 'pointer', borderBottom: `2.5px solid ${tab === t.id ? 'var(--hijau)' : 'transparent'}`, transition: 'all 0.2s', marginBottom: -1 }}>
+              <button 
+                key={t.id} 
+                onClick={() => { setTab(t.id); setAlert(null); }}
+                style={{ 
+                  flex: 1, 
+                  padding: '16px', 
+                  background: 'none', 
+                  border: 'none', 
+                  fontFamily: 'var(--font-body)', 
+                  fontWeight: 700, 
+                  fontSize: '0.95rem', 
+                  color: tab === t.id ? 'var(--hijau)' : 'var(--abu-400)', 
+                  cursor: 'pointer', 
+                  borderBottom: `2.5px solid ${tab === t.id ? 'var(--hijau)' : 'transparent'}`, 
+                  transition: 'all 0.2s', 
+                  marginBottom: -1 
+                }}
+              >
                 {t.label}
               </button>
             ))}
@@ -138,21 +187,60 @@ React.useEffect(() => {
                       placeholder="Password Anda"
                       style={{ width: '100%', padding: '13px 48px 13px 16px', border: '1.5px solid var(--abu-200)', borderRadius: 'var(--radius-md)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}
                     />
-                    <button onClick={() => setShowPass(!showPass)} type="button"
-                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--abu-400)' }}>
+                    <button 
+                      onClick={() => setShowPass(!showPass)} 
+                      type="button"
+                      style={{ 
+                        position: 'absolute', 
+                        right: 14, 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        fontSize: '1rem', 
+                        color: 'var(--abu-400)' 
+                      }}
+                    >
                       {showPass ? '🙈' : '👁️'}
                     </button>
                   </div>
                 </div>
 
-                <button onClick={handleLogin} disabled={loading}
-                  style={{ width: '100%', padding: '14px', background: loading ? 'var(--abu-200)' : 'var(--hijau)', color: '#fff', border: 'none', borderRadius: 'var(--radius-full)', fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
+                <button 
+                  onClick={handleLogin} 
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '14px', 
+                    background: loading ? 'var(--abu-200)' : 'var(--hijau)', 
+                    color: '#fff', 
+                    border: 'none', 
+                    borderRadius: 'var(--radius-full)', 
+                    fontFamily: 'var(--font-body)', 
+                    fontWeight: 700, 
+                    fontSize: '1rem', 
+                    cursor: loading ? 'not-allowed' : 'pointer', 
+                    transition: 'all 0.2s' 
+                  }}
+                >
                   {loading ? '⏳ Memproses...' : 'Masuk →'}
                 </button>
 
                 <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.82rem', color: 'var(--abu-400)' }}>
                   Belum punya akun?{' '}
-                  <button onClick={() => setTab('daftar')} style={{ background: 'none', border: 'none', color: 'var(--hijau)', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: '0.82rem' }}>
+                  <button 
+                    onClick={() => setTab('daftar')} 
+                    style={{ 
+                      background: 'none', 
+                      border: 'none', 
+                      color: 'var(--hijau)', 
+                      fontWeight: 700, 
+                      cursor: 'pointer', 
+                      fontFamily: 'var(--font-body)', 
+                      fontSize: '0.82rem' 
+                    }}
+                  >
                     Daftar sekarang
                   </button>
                 </p>
@@ -179,8 +267,21 @@ React.useEffect(() => {
                       placeholder="Min. 6 karakter"
                       style={{ width: '100%', padding: '13px 48px 13px 16px', border: '1.5px solid var(--abu-200)', borderRadius: 'var(--radius-md)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}
                     />
-                    <button onClick={() => setShowRegPass(!showRegPass)} type="button"
-                      style={{ position: 'absolute', right: 14, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', fontSize: '1rem', color: 'var(--abu-400)' }}>
+                    <button 
+                      onClick={() => setShowRegPass(!showRegPass)} 
+                      type="button"
+                      style={{ 
+                        position: 'absolute', 
+                        right: 14, 
+                        top: '50%', 
+                        transform: 'translateY(-50%)', 
+                        background: 'none', 
+                        border: 'none', 
+                        cursor: 'pointer', 
+                        fontSize: '1rem', 
+                        color: 'var(--abu-400)' 
+                      }}
+                    >
                       {showRegPass ? '🙈' : '👁️'}
                     </button>
                   </div>
@@ -196,21 +297,54 @@ React.useEffect(() => {
                     onChange={e => setRegConfirm(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && handleDaftar()}
                     placeholder="Ulangi password"
-                    style={{ width: '100%', padding: '13px 16px', border: `1.5px solid ${regConfirm && regConfirm !== regPassword ? 'var(--danger)' : 'var(--abu-200)'}`, borderRadius: 'var(--radius-md)', fontSize: '1rem', fontFamily: 'var(--font-body)' }}
+                    style={{ 
+                      width: '100%', 
+                      padding: '13px 16px', 
+                      border: `1.5px solid ${regConfirm && regConfirm !== regPassword ? 'var(--danger)' : 'var(--abu-200)'}`, 
+                      borderRadius: 'var(--radius-md)', 
+                      fontSize: '1rem', 
+                      fontFamily: 'var(--font-body)' 
+                    }}
                   />
                   {regConfirm && regConfirm !== regPassword && (
                     <p style={{ fontSize: '0.72rem', color: 'var(--danger)', marginTop: 4 }}>Password tidak cocok</p>
                   )}
                 </div>
 
-                <button onClick={handleDaftar} disabled={loading}
-                  style={{ width: '100%', padding: '14px', background: loading ? 'var(--abu-200)' : 'var(--hijau)', color: '#fff', border: 'none', borderRadius: 'var(--radius-full)', fontFamily: 'var(--font-body)', fontWeight: 700, fontSize: '1rem', cursor: loading ? 'not-allowed' : 'pointer', transition: 'all 0.2s' }}>
+                <button 
+                  onClick={handleDaftar} 
+                  disabled={loading}
+                  style={{ 
+                    width: '100%', 
+                    padding: '14px', 
+                    background: loading ? 'var(--abu-200)' : 'var(--hijau)', 
+                    color: '#fff', 
+                    border: 'none', 
+                    borderRadius: 'var(--radius-full)', 
+                    fontFamily: 'var(--font-body)', 
+                    fontWeight: 700, 
+                    fontSize: '1rem', 
+                    cursor: loading ? 'not-allowed' : 'pointer', 
+                    transition: 'all 0.2s' 
+                  }}
+                >
                   {loading ? '⏳ Mendaftarkan...' : '✅ Daftar Sekarang'}
                 </button>
 
                 <p style={{ textAlign: 'center', marginTop: 16, fontSize: '0.82rem', color: 'var(--abu-400)' }}>
                   Sudah punya akun?{' '}
-                  <button onClick={() => setTab('login')} style={{ background: 'none', border: 'none', color: 'var(--hijau)', fontWeight: 700, cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: '0.82rem' }}>
+                  <button 
+                    onClick={() => setTab('login')} 
+                    style={{ 
+                      background: 'none', 
+                      border: 'none', 
+                      color: 'var(--hijau)', 
+                      fontWeight: 700, 
+                      cursor: 'pointer', 
+                      fontFamily: 'var(--font-body)', 
+                      fontSize: '0.82rem' 
+                    }}
+                  >
                     Masuk
                   </button>
                 </p>

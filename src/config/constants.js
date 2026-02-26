@@ -6,6 +6,7 @@ export const KABUPATEN_NAME = process.env.REACT_APP_KABUPATEN_NAME || 'Kabupaten
 export const ROLES = {
   WARGA: 'warga',
   RT: 'rt',
+  ADMIN: 'admin', // Untuk backward compatibility
   ADMIN_DESA: 'admin_desa', // Admin Desa/UPZ
 };
 
@@ -62,6 +63,10 @@ export const ROUTES = {
   ADMIN_DESA_IMPORT: '/admin-desa/import',
   ADMIN_DESA_CETAK_QR: '/admin-desa/cetak-qr',
   ADMIN_DESA_LAPORAN: '/admin-desa/laporan',
+  // Legacy routes untuk backward compatibility
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_KELOLA: '/admin/kelola-kencleng',
+  ADMIN_KELOLA_WARGA: '/admin/kelola-warga',
 };
 
 export const COLLECTIONS = {

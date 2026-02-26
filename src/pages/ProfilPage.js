@@ -45,7 +45,10 @@ const ProfilPage = () => {
   };
 
   const handleSave = async () => {
-    if (!nama.trim()) { setAlert({ type: 'error', message: 'Nama tidak boleh kosong.' }); return; }
+    if (!nama.trim()) { 
+      setAlert({ type: 'error', message: 'Nama tidak boleh kosong.' }); 
+      return; 
+    }
     setSaving(true);
     try {
       await updateUserProfile(user.uid, { nama: nama.trim(), noHp, alamat });
@@ -54,22 +57,38 @@ const ProfilPage = () => {
       setEditMode(false);
     } catch (err) {
       setAlert({ type: 'error', message: err.message });
-    } finally { setSaving(false); }
+    } finally { 
+      setSaving(false); 
+    }
   };
 
   const roleLabel = {
     [ROLES.WARGA]: '👥 Warga',
     [ROLES.RT]: '🏛️ Pengurus RT',
     [ROLES.ADMIN]: '⚙️ Admin',
+    [ROLES.ADMIN_DESA]: '🏢 Admin Desa',
   };
 
   return (
     <div className="app-layout">
-      <Header title="Profil Saya"
+      <Header 
+        title="Profil Saya"
         rightAction={
           !editMode ? (
-            <button onClick={handleEditOpen}
-              style={{ background:'var(--hijau-pale)', color:'var(--hijau)', padding:'6px 14px', borderRadius:'var(--radius-full)', fontSize:'0.78rem', fontWeight:700, border:'none', cursor:'pointer', fontFamily:'var(--font-body)' }}>
+            <button 
+              onClick={handleEditOpen}
+              style={{ 
+                background:'var(--hijau-pale)', 
+                color:'var(--hijau)', 
+                padding:'6px 14px', 
+                borderRadius:'var(--radius-full)', 
+                fontSize:'0.78rem', 
+                fontWeight:700, 
+                border:'none', 
+                cursor:'pointer', 
+                fontFamily:'var(--font-body)' 
+              }}
+            >
               ✏️ Edit
             </button>
           ) : null
@@ -80,11 +99,33 @@ const ProfilPage = () => {
 
         {/* Avatar */}
         <div style={{ textAlign:'center', marginBottom:24 }}>
-          <div style={{ width:80, height:80, background:'linear-gradient(135deg, var(--hijau), var(--hijau-muda))', borderRadius:'50%', display:'inline-flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', fontWeight:700, color:'#fff', marginBottom:12, boxShadow:'0 8px 24px rgba(26,107,60,0.25)' }}>
+          <div style={{ 
+            width:80, 
+            height:80, 
+            background:'linear-gradient(135deg, var(--hijau), var(--hijau-muda))', 
+            borderRadius:'50%', 
+            display:'inline-flex', 
+            alignItems:'center', 
+            justifyContent:'center', 
+            fontSize:'2rem', 
+            fontWeight:700, 
+            color:'#fff', 
+            marginBottom:12, 
+            boxShadow:'0 8px 24px rgba(26,107,60,0.25)' 
+          }}>
             {initials(userData?.nama)}
           </div>
           <h2 style={{ fontFamily:'var(--font-display)', fontSize:'1.4rem', color:'var(--hitam)' }}>{userData?.nama || 'User'}</h2>
-          <span style={{ display:'inline-block', marginTop:6, padding:'4px 12px', background:'var(--hijau-pale)', color:'var(--hijau)', borderRadius:'var(--radius-full)', fontSize:'0.8rem', fontWeight:600 }}>
+          <span style={{ 
+            display:'inline-block', 
+            marginTop:6, 
+            padding:'4px 12px', 
+            background:'var(--hijau-pale)', 
+            color:'var(--hijau)', 
+            borderRadius:'var(--radius-full)', 
+            fontSize:'0.8rem', 
+            fontWeight:600 
+          }}>
             {roleLabel[userData?.role] || 'Warga'}
           </span>
         </div>
@@ -103,14 +144,54 @@ const ProfilPage = () => {
                 <label style={{ display:'block', fontSize:'0.75rem', fontWeight:700, color:'var(--abu-500)', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.05em' }}>
                   {f.label} {f.required && <span style={{ color:'var(--danger)' }}>*</span>}
                 </label>
-                <input type="text" value={f.value} onChange={e=>f.onChange(e.target.value)} placeholder={f.placeholder}
-                  style={{ width:'100%', padding:'12px 14px', border:'1.5px solid var(--abu-200)', borderRadius:'var(--radius-md)', fontSize:'0.95rem', fontFamily:'var(--font-body)' }} />
+                <input 
+                  type="text" 
+                  value={f.value} 
+                  onChange={e=>f.onChange(e.target.value)} 
+                  placeholder={f.placeholder}
+                  style={{ 
+                    width:'100%', 
+                    padding:'12px 14px', 
+                    border:'1.5px solid var(--abu-200)', 
+                    borderRadius:'var(--radius-md)', 
+                    fontSize:'0.95rem', 
+                    fontFamily:'var(--font-body)' 
+                  }} 
+                />
               </div>
             ))}
 
             <div style={{ display:'flex', gap:10, marginTop:4 }}>
-              <button onClick={() => setEditMode(false)} style={{ flex:1, padding:'12px', background:'var(--abu-100)', border:'none', borderRadius:'var(--radius-full)', fontFamily:'var(--font-body)', fontWeight:600, cursor:'pointer' }}>Batal</button>
-              <button onClick={handleSave} disabled={saving} style={{ flex:2, padding:'12px', background:saving?'var(--abu-200)':'var(--hijau)', color:'#fff', border:'none', borderRadius:'var(--radius-full)', fontFamily:'var(--font-body)', fontWeight:700, cursor:saving?'not-allowed':'pointer' }}>
+              <button 
+                onClick={() => setEditMode(false)} 
+                style={{ 
+                  flex:1, 
+                  padding:'12px', 
+                  background:'var(--abu-100)', 
+                  border:'none', 
+                  borderRadius:'var(--radius-full)', 
+                  fontFamily:'var(--font-body)', 
+                  fontWeight:600, 
+                  cursor:'pointer' 
+                }}
+              >
+                Batal
+              </button>
+              <button 
+                onClick={handleSave} 
+                disabled={saving} 
+                style={{ 
+                  flex:2, 
+                  padding:'12px', 
+                  background:saving?'var(--abu-200)':'var(--hijau)', 
+                  color:'#fff', 
+                  border:'none', 
+                  borderRadius:'var(--radius-full)', 
+                  fontFamily:'var(--font-body)', 
+                  fontWeight:700, 
+                  cursor:saving?'not-allowed':'pointer' 
+                }}
+              >
                 {saving ? '⏳ Menyimpan...' : '✅ Simpan'}
               </button>
             </div>
@@ -131,13 +212,35 @@ const ProfilPage = () => {
           <Card style={{ marginBottom:16 }}>
             <h3 style={{ fontSize:'0.8rem', fontWeight:700, color:'var(--abu-500)', textTransform:'uppercase', letterSpacing:'0.05em', marginBottom:12 }}>Menu Pengurus</h3>
             {[
-              ...(userData?.role === ROLES.ADMIN ? [{ icon:'📊', label:'Admin Dashboard', path: ROUTES.ADMIN_DASHBOARD }] : []),
+              ...(userData?.role === ROLES.ADMIN_DESA || userData?.role === ROLES.ADMIN ? [
+                { icon:'📊', label:'Dashboard Admin', path: ROUTES.ADMIN_DESA_DASHBOARD }
+              ] : []),
               { icon:'💰', label:'Konfirmasi Setoran', path: ROUTES.RT_SETORAN },
               { icon:'💸', label:'Manajemen Penarikan', path: ROUTES.RT_PENARIKAN },
-              ...(userData?.role === ROLES.ADMIN ? [{ icon:'👥', label:'Kelola Warga', path:'/admin/kelola-warga' }] : []),
+              { icon:'✅', label:'Verifikasi Setoran', path: ROUTES.RT_VERIFIKASI },
+              ...(userData?.role === ROLES.ADMIN_DESA || userData?.role === ROLES.ADMIN ? [
+                { icon:'🪣', label:'Kelola Kencleng', path: ROUTES.ADMIN_DESA_KELOLA },
+                { icon:'👥', label:'Kelola Warga', path: ROUTES.ADMIN_DESA_KELOLA_WARGA },
+                { icon:'🏛️', label:'Kelola RT', path: ROUTES.ADMIN_DESA_KELOLA_RT },
+              ] : []),
             ].map(item => (
-              <button key={item.path} onClick={() => navigate(item.path)}
-                style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'12px 0', borderBottom:'1px solid var(--abu-100)', background:'none', border:'none', cursor:'pointer', fontFamily:'var(--font-body)', textAlign:'left' }}>
+              <button 
+                key={item.path} 
+                onClick={() => navigate(item.path)}
+                style={{ 
+                  width:'100%', 
+                  display:'flex', 
+                  alignItems:'center', 
+                  gap:12, 
+                  padding:'12px 0', 
+                  borderBottom:'1px solid var(--abu-100)', 
+                  background:'none', 
+                  border:'none', 
+                  cursor:'pointer', 
+                  fontFamily:'var(--font-body)', 
+                  textAlign:'left' 
+                }}
+              >
                 <span style={{ fontSize:'1.1rem' }}>{item.icon}</span>
                 <span style={{ flex:1, fontSize:'0.9rem', fontWeight:500 }}>{item.label}</span>
                 <span style={{ color:'var(--abu-300)' }}>→</span>
@@ -146,8 +249,14 @@ const ProfilPage = () => {
           </Card>
         )}
 
-        <Button variant="ghost" fullWidth onClick={handleLogout} loading={loggingOut}
-          style={{ borderColor:'var(--danger)', color:'var(--danger)' }} icon="🚪">
+        <Button 
+          variant="ghost" 
+          fullWidth 
+          onClick={handleLogout} 
+          loading={loggingOut}
+          style={{ borderColor:'var(--danger)', color:'var(--danger)' }} 
+          icon="🚪"
+        >
           Keluar
         </Button>
       </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Header from '../../components/layout/Header';
 import MobileNav from '../../components/layout/MobileNav';
 import Card from '../../components/common/Card';
@@ -7,7 +8,7 @@ import Alert from '../../components/common/Alert';
 import { Spinner } from '../../components/common/Loading';
 import { getKenclengById, getRiwayatSetoran } from '../../services/kenclengService';
 import { formatRupiah, formatTanggal, formatProgress } from '../../utils/formatter';
-import { DESA_NAME, KECAMATAN_NAME } from '../../config/constants';
+import { DESA_NAME, KECAMATAN_NAME, ROUTES } from '../../config/constants';
 
 const RiwayatTable = ({ riwayat }) => (
   <div style={{ overflowX: 'auto' }}>
@@ -25,7 +26,14 @@ const RiwayatTable = ({ riwayat }) => (
             <td style={{ padding: '12px 8px', fontSize: '0.8rem' }}>{r.tanggal}</td>
             <td style={{ padding: '12px 8px', fontSize: '0.8rem', fontWeight: 600, textAlign: 'right' }}>{formatRupiah(r.nominal)}</td>
             <td style={{ padding: '12px 8px', textAlign: 'center' }}>
-              <span style={{ background: r.status === 'diterima' ? 'var(--hijau-pale)' : 'var(--kuning-pale)', color: r.status === 'diterima' ? 'var(--hijau)' : 'var(--kuning)', padding: '2px 8px', borderRadius: 'var(--radius-full)', fontSize: '0.7rem', fontWeight: 600 }}>
+              <span style={{ 
+                background: r.status === 'diterima' ? 'var(--hijau-pale)' : 'var(--kuning-pale)', 
+                color: r.status === 'diterima' ? 'var(--hijau)' : 'var(--kuning)', 
+                padding: '2px 8px', 
+                borderRadius: 'var(--radius-full)', 
+                fontSize: '0.7rem', 
+                fontWeight: 600 
+              }}>
                 {r.status === 'diterima' ? '✓ Diterima' : '⏳ Pending'}
               </span>
             </td>
@@ -37,6 +45,7 @@ const RiwayatTable = ({ riwayat }) => (
 );
 
 const PortalPage = () => {
+  const navigate = useNavigate();
   const [kenclengId, setKenclengId] = useState('');
   const [mode, setMode] = useState('input'); // input | scan | result
   const [kencleng, setKencleng] = useState(null);
@@ -55,6 +64,7 @@ const PortalPage = () => {
       const k = await getKenclengById(kenclengId.trim());
       if (!k) {
         setAlert({ type: 'error', message: 'Kencleng tidak ditemukan' });
+        setLoading(false);
         return;
       }
 
@@ -63,7 +73,8 @@ const PortalPage = () => {
       // Format riwayat
       const formattedRiwayat = riwayatData.map(r => ({
         ...r,
-        tanggal: r.createdAt ? formatTanggal(r.createdAt) : '-'
+        tanggal: r.createdAt ? formatTanggal(r.createdAt) : '-',
+        status: r.status || 'pending'
       }));
 
       setKencleng(k);
@@ -77,9 +88,8 @@ const PortalPage = () => {
   };
 
   const handleScan = () => {
-    setMode('scan');
-    // Implementasi scan QR
-    alert('Fitur scan QR akan diimplementasikan');
+    // Navigate ke halaman scan
+    navigate('/scan');
   };
 
   const totalBulanIni = riwayat
@@ -108,13 +118,29 @@ const PortalPage = () => {
                 type="text"
                 value={kenclengId}
                 onChange={(e) => setKenclengId(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCari()}
                 placeholder="Contoh: KCLG-0102-001"
-                style={{ flex: 1, padding: '14px 16px', border: '1.5px solid var(--abu-200)', borderRadius: 'var(--radius-md)', fontSize: '0.9rem', fontFamily: 'monospace' }}
+                style={{ 
+                  flex: 1, 
+                  padding: '14px 16px', 
+                  border: '1.5px solid var(--abu-200)', 
+                  borderRadius: 'var(--radius-md)', 
+                  fontSize: '0.9rem', 
+                  fontFamily: 'monospace' 
+                }}
               />
               <button
                 onClick={handleCari}
                 disabled={loading}
-                style={{ padding: '0 24px', background: loading ? 'var(--abu-200)' : 'var(--hijau)', color: '#fff', border: 'none', borderRadius: 'var(--radius-md)', fontWeight: 600, cursor: loading ? 'not-allowed' : 'pointer' }}
+                style={{ 
+                  padding: '0 24px', 
+                  background: loading ? 'var(--abu-200)' : 'var(--hijau)', 
+                  color: '#fff', 
+                  border: 'none', 
+                  borderRadius: 'var(--radius-md)', 
+                  fontWeight: 600, 
+                  cursor: loading ? 'not-allowed' : 'pointer' 
+                }}
               >
                 {loading ? '⏳' : '🔍 Cari'}
               </button>
@@ -133,9 +159,9 @@ const PortalPage = () => {
 
         {mode === 'scan' && (
           <Card>
-            <p style={{ textAlign: 'center', marginBottom: 16 }}>Arahkan kamera ke QR Code kencleng</p>
+            <p style={{ textAlign: 'center', marginBottom: 16 }}>Mengarahkan ke halaman scan...</p>
             <div style={{ height: 300, background: 'var(--hitam)', borderRadius: 'var(--radius-lg)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff' }}>
-              📷 Kamera
+              📷 Memuat kamera...
             </div>
             <Button variant="ghost" onClick={() => setMode('input')} style={{ marginTop: 16 }}>
               Kembali
@@ -154,7 +180,7 @@ const PortalPage = () => {
                 </div>
                 <div>
                   <div style={{ fontSize: '0.7rem', color: 'var(--abu-400)' }}>RT/RW</div>
-                  <div style={{ fontWeight: 600 }}>{kencleng.rt}/{kencleng.rw}</div>
+                  <div style={{ fontWeight: 600 }}>{kencleng.rt || '-'}/{kencleng.rw || '-'}</div>
                 </div>
               </div>
               <div style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 4 }}>{kencleng.nama}</div>
@@ -165,7 +191,14 @@ const PortalPage = () => {
             <Card style={{ marginBottom: 16 }}>
               <h3 style={{ marginBottom: 12 }}>RIWAYAT SETORAN ANDA</h3>
               <RiwayatTable riwayat={riwayat} />
-              <div style={{ marginTop: 16, paddingTop: 12, borderTop: '1px solid var(--abu-100)', display: 'flex', justifyContent: 'space-between', fontWeight: 600 }}>
+              <div style={{ 
+                marginTop: 16, 
+                paddingTop: 12, 
+                borderTop: '1px solid var(--abu-100)', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                fontWeight: 600 
+              }}>
                 <span>Total Bulan Ini:</span>
                 <span style={{ color: 'var(--hijau)' }}>{formatRupiah(totalBulanIni)}</span>
               </div>
@@ -185,11 +218,20 @@ const PortalPage = () => {
                     <span style={{ fontWeight: 600 }}>{totalBulanIni}/{formatRupiah(kencleng.target || 100000)} ({progress}%)</span>
                   </div>
                   <div style={{ height: 8, background: 'var(--abu-100)', borderRadius: 4, overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${progress}%`, background: progress >= 100 ? 'var(--kuning)' : 'var(--hijau)' }} />
+                    <div style={{ 
+                      height: '100%', 
+                      width: `${progress}%`, 
+                      background: progress >= 100 ? 'var(--kuning)' : 'var(--hijau)' 
+                    }} />
                   </div>
                 </div>
               </div>
-              <Button variant="secondary" icon="📊" fullWidth onClick={() => alert('Laporan tahunan')}>
+              <Button 
+                variant="secondary" 
+                icon="📊" 
+                fullWidth 
+                onClick={() => alert('Fitur laporan tahunan akan segera hadir')}
+              >
                 LAPORAN TAHUNAN
               </Button>
             </Card>

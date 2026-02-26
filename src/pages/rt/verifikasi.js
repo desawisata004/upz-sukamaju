@@ -4,16 +4,24 @@ import MobileNav from '../../components/layout/MobileNav';
 import Card from '../../components/common/Card';
 import Alert from '../../components/common/Alert';
 import { Spinner } from '../../components/common/Loading';
-import { getPendingSetoran, approveSetoran, rejectSetoran } from '../../services/kenclengService';
+import { getPendingSetoran, approveSetoran, rejectSetoran, approveSetoranBatch } from '../../services/kenclengService';
 import { formatRupiah, formatTanggal } from '../../utils/formatter';
 import { useAuth } from '../../hooks/useAuth';
 
-const SetoranItem = ({ item, onApprove, onReject }) => {
+const SetoranItem = ({ item, onApprove, onReject, onSelect, isSelected }) => {
   const [showDetail, setShowDetail] = useState(false);
 
   return (
-    <Card style={{ marginBottom: 12 }}>
+    <Card style={{ marginBottom: 12, border: isSelected ? '2px solid var(--hijau)' : 'none' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12 }}>
+        <div style={{ width: 24 }}>
+          <input
+            type="checkbox"
+            checked={isSelected}
+            onChange={() => onSelect(item.id)}
+            style={{ width: 20, height: 20, cursor: 'pointer' }}
+          />
+        </div>
         <div style={{ width: 40, height: 40, background: 'var(--kuning-pale)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem' }}>
           ⏳
         </div>
@@ -78,6 +86,7 @@ const SetoranItem = ({ item, onApprove, onReject }) => {
 const RTVerifikasiPage = () => {
   const { userData } = useAuth();
   const [pendingList, setPendingList] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(new Set());
   const [loading, setLoading] = useState(true);
   const [alert, setAlert] = useState(null);
   const [processing, setProcessing] = useState(false);
@@ -87,6 +96,7 @@ const RTVerifikasiPage = () => {
     try {
       const data = await getPendingSetoran();
       setPendingList(data);
+      setSelectedIds(new Set());
     } catch (err) {
       setAlert({ type: 'error', message: 'Gagal memuat data: ' + err.message });
     } finally {
@@ -125,11 +135,39 @@ const RTVerifikasiPage = () => {
     }
   };
 
-  const handleMassal = () => {
-    if (pendingList.length === 0) return;
-    if (confirm(`Terima ${pendingList.length} setoran sekaligus?`)) {
-      // Implementasi massal
-      alert('Fitur verifikasi massal akan diimplementasikan');
+  const handleSelect = (id) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const handleSelectAll = () => {
+    if (selectedIds.size === pendingList.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(pendingList.map(item => item.id)));
+    }
+  };
+
+  const handleBatchApprove = async () => {
+    if (selectedIds.size === 0) return;
+    
+    const selectedItems = pendingList.filter(item => selectedIds.has(item.id));
+    if (confirm(`Terima ${selectedItems.length} setoran sekaligus?`)) {
+      setProcessing(true);
+      try {
+        await approveSetoranBatch(selectedItems);
+        setAlert({ type: 'success', message: `✅ ${selectedItems.length} setoran berhasil diterima` });
+        loadData();
+      } catch (err) {
+        setAlert({ type: 'error', message: err.message });
+      } finally {
+        setProcessing(false);
+      }
     }
   };
 
@@ -142,13 +180,41 @@ const RTVerifikasiPage = () => {
         subtitle={`RT 01 - ${userData?.nama || 'Sukamaju'}`}
         showBack
         rightAction={
-          <button
-            onClick={handleMassal}
-            disabled={pendingList.length === 0}
-            style={{ background: 'var(--hijau)', color: '#fff', border: 'none', borderRadius: 'var(--radius-full)', padding: '8px 12px', fontSize: '0.8rem', fontWeight: 600, cursor: pendingList.length === 0 ? 'not-allowed' : 'pointer', opacity: pendingList.length === 0 ? 0.5 : 1 }}
-          >
-            ✓ Verifikasi Massal
-          </button>
+          selectedIds.size > 0 ? (
+            <button
+              onClick={handleBatchApprove}
+              disabled={processing}
+              style={{ 
+                background: 'var(--hijau)', 
+                color: '#fff', 
+                border: 'none', 
+                borderRadius: 'var(--radius-full)', 
+                padding: '8px 12px', 
+                fontSize: '0.8rem', 
+                fontWeight: 600, 
+                cursor: processing ? 'not-allowed' : 'pointer',
+                opacity: processing ? 0.5 : 1
+              }}
+            >
+              ✓ Verifikasi {selectedIds.size}
+            </button>
+          ) : (
+            <button
+              onClick={loadData}
+              style={{ 
+                background: 'var(--hijau-pale)', 
+                color: 'var(--hijau)', 
+                border: 'none', 
+                borderRadius: 'var(--radius-full)', 
+                padding: '8px 12px', 
+                fontSize: '0.8rem', 
+                fontWeight: 600, 
+                cursor: 'pointer' 
+              }}
+            >
+              🔄 Refresh
+            </button>
+          )
         }
       />
 
@@ -166,6 +232,24 @@ const RTVerifikasiPage = () => {
             <div style={{ fontSize: '3rem', opacity: 0.3 }}>🔔</div>
           </div>
         </Card>
+
+        {/* Select All */}
+        {pendingList.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={selectedIds.size === pendingList.length}
+                onChange={handleSelectAll}
+                style={{ width: 18, height: 18 }}
+              />
+              <span style={{ fontSize: '0.9rem' }}>Pilih Semua</span>
+            </label>
+            <span style={{ fontSize: '0.8rem', color: 'var(--abu-400)' }}>
+              {selectedIds.size} dari {pendingList.length} dipilih
+            </span>
+          </div>
+        )}
 
         {/* Daftar Setoran */}
         {loading ? (
@@ -186,6 +270,8 @@ const RTVerifikasiPage = () => {
                 item={item}
                 onApprove={handleApprove}
                 onReject={handleReject}
+                onSelect={handleSelect}
+                isSelected={selectedIds.has(item.id)}
               />
             ))}
           </div>
