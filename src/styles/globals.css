@@ -1,0 +1,119 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-gray-50 text-gray-900;
+    overscroll-behavior-y: contain;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Better touch targets for mobile */
+  button, a, input[type="button"], input[type="submit"] {
+    @apply touch-target;
+  }
+}
+
+@layer components {
+  /* Mobile-friendly touch targets */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Card styles */
+  .card {
+    @apply bg-white rounded-xl shadow-sm p-4;
+  }
+  
+  /* Bottom sheet animation */
+  .bottom-sheet {
+    @apply fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-lg transform transition-transform duration-300;
+  }
+  
+  /* Pull to refresh */
+  .ptr-element {
+    @apply flex justify-center items-center py-4 text-gray-500;
+  }
+
+  /* Scan QR overlay */
+  #qr-reader {
+    @apply w-full overflow-hidden rounded-lg;
+  }
+
+  #qr-reader video {
+    @apply w-full h-auto;
+  }
+
+  #qr-reader__scan_region {
+    @apply min-h-[300px];
+  }
+
+  #qr-reader__dashboard {
+    @apply p-4;
+  }
+
+  #qr-reader__dashboard_section_csr button {
+    @apply bg-green-600 text-white px-4 py-2 rounded-lg;
+  }
+
+  /* Loading skeleton */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 rounded;
+  }
+
+  /* Prevent zoom on input focus for iOS */
+  @media screen and (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  /* Bottom navigation spacing */
+  .has-mobile-nav {
+    @apply pb-20;
+  }
+
+  /* Custom animations */
+  @keyframes slide-up {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+
+  .animate-slide-up {
+    animation: slide-up 0.3s ease-out;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-green-600 to-green-700;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-gray-100;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-gray-400 rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-gray-500;
+}
