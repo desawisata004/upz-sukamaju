@@ -1,0 +1,64 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function getUserRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && getUserRole() == 'admin';
+    }
+    
+    function isRT() {
+      return isAuthenticated() && getUserRole() in ['rt', 'admin'];
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Users collection
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    
+    // Kencleng collection
+    match /kencleng/{doc} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isOwner(resource.data.userId) || isRT();
+      allow delete: if false; // Soft delete via status update
+    }
+    
+    // Setoran collection
+    match /setoran/{doc} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isRT();
+      allow delete: if false; // No hard delete
+    }
+    
+    // Penarikan collection
+    match /penarikan/{doc} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated();
+      allow update: if isRT();
+      allow delete: if false; // No hard delete
+    }
+    
+    // Notifications collection
+    match /notifications/{doc} {
+      allow read: if isAuthenticated() && (request.auth.uid == resource.data.userId || isRT());
+      allow write: if isAuthenticated();
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+  }
+}

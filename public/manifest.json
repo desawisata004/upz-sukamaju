@@ -1,14 +1,32 @@
 {
   "short_name": "Kencleng",
   "name": "Kencleng Digital",
+  "description": "Aplikasi tabungan warga RT berbasis QR Code",
   "icons": [
-    { "src": "icons/favicon.ico", "sizes": "64x64 32x32 24x24 16x16", "type": "image/x-icon" },
-    { "src": "icons/logo192.png", "type": "image/png", "sizes": "192x192" },
-    { "src": "icons/logo512.png", "type": "image/png", "sizes": "512x512" }
+    { 
+      "src": "/icons/favicon.ico", 
+      "sizes": "64x64 32x32 24x24 16x16", 
+      "type": "image/x-icon" 
+    },
+    { 
+      "src": "/icons/logo192.png", 
+      "type": "image/png", 
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    { 
+      "src": "/icons/logo512.png", 
+      "type": "image/png", 
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
   ],
-  "start_url": ".",
+  "start_url": "/",
   "display": "standalone",
   "theme_color": "#1a6b3c",
   "background_color": "#f5f0e8",
-  "orientation": "portrait"
+  "orientation": "portrait",
+  "categories": ["finance", "utilities"],
+  "lang": "id-ID",
+  "dir": "ltr"
 }

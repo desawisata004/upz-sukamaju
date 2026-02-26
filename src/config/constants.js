@@ -31,8 +31,11 @@ export const JENIS_PENARIKAN = {
 };
 
 export const NOMINAL_PRESETS = [5000, 10000, 20000, 50000, 100000];
+export const NOMINAL_PRESETS_TARIK = [50000, 100000, 200000, 500000];
 
 export const TARGET_TABUNGAN = 500000;
+export const MAX_SETORAN = 10000000;
+export const MIN_SETORAN = 1000;
 
 export const ROUTES = {
   HOME: '/',
@@ -42,6 +45,7 @@ export const ROUTES = {
   RT_PENARIKAN: '/rt/penarikan',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_KELOLA: '/admin/kelola-kencleng',
+  ADMIN_KELOLA_WARGA: '/admin/kelola-warga',
 };
 
 export const COLLECTIONS = {
