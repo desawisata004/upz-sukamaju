@@ -2,8 +2,15 @@ import {
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
+  createUserWithEmailAndPassword,
 } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
+import { 
+  doc, 
+  getDoc, 
+  setDoc, 
+  updateDoc, 
+  serverTimestamp 
+} from 'firebase/firestore';
 import { auth, db } from './firebase';
 
 export const loginWithEmail = async (email, password) => {
@@ -69,10 +76,6 @@ export const onAuthChange = (callback) => {
     return () => {};
   }
 };
-import {
-  createUserWithEmailAndPassword,
-} from 'firebase/auth';
-import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
 
 export const registerUser = async ({ email, password, nama, noHp, alamat, role = 'warga' }) => {
   if (!auth) throw new Error('Firebase Auth tidak tersedia');

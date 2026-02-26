@@ -43,6 +43,7 @@ export const notifyTargetTercapai = (userId, target) =>
     body: `Selamat! Kencleng Anda telah mencapai target Rp ${target.toLocaleString('id-ID')}.`,
     type: 'target_tercapai',
   });
+
 export const notifyPenarikanDiajukan = (rtUserId, namaPemilik, nominal) =>
   sendNotification({
     userId: rtUserId,
