@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import authService from '@/services/auth';
+import { auth } from '@/services/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const AuthContext = createContext();
 
@@ -16,7 +17,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = authService.onAuthStateChanged((user) => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
     });
@@ -24,12 +25,27 @@ export const AuthProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+  // Simple auth functions (bisa dikembangkan nanti)
+  const login = async (email, password) => {
+    // Implementasi login
+    return { user: null, error: 'Not implemented' };
+  };
+
+  const logout = async () => {
+    // Implementasi logout
+  };
+
+  const register = async (email, password) => {
+    // Implementasi register
+    return { user: null, error: 'Not implemented' };
+  };
+
   const value = {
     user,
     loading,
-    login: authService.login,
-    logout: authService.logout,
-    register: authService.register
+    login,
+    logout,
+    register
   };
 
   return (

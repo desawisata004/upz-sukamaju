@@ -7,7 +7,6 @@ const Layout = ({ children }) => {
   const router = useRouter();
   const hideNav = router.pathname === '/login';
   
-  // Tentukan judul berdasarkan path
   const getTitle = () => {
     if (router.pathname === '/') return 'Beranda';
     if (router.pathname === '/scan') return 'Scan QR';

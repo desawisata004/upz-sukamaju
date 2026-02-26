@@ -26,6 +26,14 @@ const nextConfig = {
       },
     ];
   },
+  // Tambahkan konfigurasi webpack untuk path alias
+  webpack: (config) => {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': require('path').resolve(__dirname, 'src'),
+    };
+    return config;
+  },
 }
 
 module.exports = nextConfig
