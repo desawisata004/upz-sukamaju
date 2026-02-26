@@ -386,3 +386,141 @@ export const getKenclengWithStats = async () => {
     return [];
   }
 };
+// ==================== PENARIKAN ====================
+
+export const createPenarikan = async ({ kenclengId, userId, nominal, jenis, catatan, requestBy }) => {
+  if (!db) throw new Error('Firestore not initialized');
+
+  // Validasi saldo cukup
+  const kencleng = await getKenclengById(kenclengId);
+  if (!kencleng) throw new Error('Kencleng tidak ditemukan.');
+  if ((kencleng.saldo || 0) < nominal) throw new Error(`Saldo tidak cukup. Saldo saat ini: ${kencleng.saldo || 0}`);
+
+  const data = {
+    kenclengId,
+    userId,
+    nominal,
+    jenis: jenis || 'sebagian',
+    catatan: catatan || '',
+    status: 'pending',
+    requestBy: requestBy || 'warga',
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  };
+
+  const ref = await addDoc(collection(db, COLLECTIONS.PENARIKAN), data);
+  return { id: ref.id, ...data };
+};
+
+export const approvePenarikan = async (penarikanId, kenclengId, nominal) => {
+  if (!db) throw new Error('Firestore not initialized');
+
+  // Cek saldo sekali lagi sebelum approve
+  const kencleng = await getKenclengById(kenclengId);
+  if (!kencleng) throw new Error('Kencleng tidak ditemukan.');
+  if ((kencleng.saldo || 0) < nominal) throw new Error('Saldo tidak mencukupi untuk penarikan ini.');
+
+  await updateDoc(doc(db, COLLECTIONS.PENARIKAN, penarikanId), {
+    status: 'disetujui',
+    approvedAt: serverTimestamp(),
+    updatedAt: serverTimestamp(),
+  });
+
+  await updateDoc(doc(db, COLLECTIONS.KENCLENG, kenclengId), {
+    saldo: increment(-nominal),
+    updatedAt: serverTimestamp(),
+  });
+};
+
+export const rejectPenarikan = async (penarikanId, alasan) => {
+  if (!db) throw new Error('Firestore not initialized');
+
+  await updateDoc(doc(db, COLLECTIONS.PENARIKAN, penarikanId), {
+    status: 'ditolak',
+    alasanDitolak: alasan || '',
+    updatedAt: serverTimestamp(),
+  });
+};
+
+export const getPendingPenarikan = async () => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.PENARIKAN),
+      where('status', '==', 'pending'),
+      orderBy('createdAt', 'asc')
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getPenarikanByKencleng = async (kenclengId) => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.PENARIKAN),
+      where('kenclengId', '==', kenclengId),
+      orderBy('createdAt', 'desc'),
+      limit(20)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getPenarikanByUser = async (userId) => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.PENARIKAN),
+      where('userId', '==', userId),
+      orderBy('createdAt', 'desc'),
+      limit(30)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getAllPenarikan = async (limitN = 50) => {
+  if (!db) return [];
+  try {
+    const q = query(
+      collection(db, COLLECTIONS.PENARIKAN),
+      orderBy('createdAt', 'desc'),
+      limit(limitN)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (error) {
+    console.error('Error:', error);
+    return [];
+  }
+};
+
+export const getPenarikanStats = async () => {
+  if (!db) return { pending: 0, disetujui: 0, totalDicairkan: 0 };
+  try {
+    const snap = await getDocs(collection(db, COLLECTIONS.PENARIKAN));
+    let pending = 0, disetujui = 0, totalDicairkan = 0;
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      if (d.status === 'pending') pending++;
+      if (d.status === 'disetujui') { disetujui++; totalDicairkan += d.nominal || 0; }
+    });
+    return { pending, disetujui, totalDicairkan };
+  } catch (error) {
+    console.error('Error:', error);
+    return { pending: 0, disetujui: 0, totalDicairkan: 0 };
+  }
+};

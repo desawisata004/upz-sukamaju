@@ -18,6 +18,18 @@ export const STATUS_SETORAN = {
   DITOLAK: 'ditolak',
 };
 
+export const STATUS_PENARIKAN = {
+  PENDING: 'pending',
+  DISETUJUI: 'disetujui',
+  DITOLAK: 'ditolak',
+  SELESAI: 'selesai',
+};
+
+export const JENIS_PENARIKAN = {
+  SEBAGIAN: 'sebagian',
+  PENUH: 'penuh',
+};
+
 export const NOMINAL_PRESETS = [5000, 10000, 20000, 50000, 100000];
 
 export const TARGET_TABUNGAN = 500000;
@@ -27,6 +39,7 @@ export const ROUTES = {
   LOGIN: '/login',
   RT_DASHBOARD: '/rt/dashboard',
   RT_SETORAN: '/rt/setoran',
+  RT_PENARIKAN: '/rt/penarikan',
   ADMIN_DASHBOARD: '/admin/dashboard',
   ADMIN_KELOLA: '/admin/kelola-kencleng',
 };
@@ -35,5 +48,6 @@ export const COLLECTIONS = {
   USERS: 'users',
   KENCLENG: 'kencleng',
   SETORAN: 'setoran',
+  PENARIKAN: 'penarikan',
   NOTIFICATIONS: 'notifications',
 };

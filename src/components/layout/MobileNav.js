@@ -14,7 +14,7 @@ const navItems = {
   [ROLES.RT]: [
     { path: ROUTES.RT_DASHBOARD, icon: '📊', label: 'Dashboard' },
     { path: ROUTES.RT_SETORAN, icon: '💰', label: 'Setoran' },
-    { path: '/scan', icon: '📷', label: 'Scan' },
+    { path: ROUTES.RT_PENARIKAN, icon: '💸', label: 'Tarik' },
     { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],
@@ -22,7 +22,7 @@ const navItems = {
     { path: ROUTES.ADMIN_DASHBOARD, icon: '📊', label: 'Dashboard' },
     { path: ROUTES.ADMIN_KELOLA, icon: '🪣', label: 'Kencleng' },
     { path: ROUTES.RT_SETORAN, icon: '💰', label: 'Setoran' },
-    { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
+    { path: ROUTES.RT_PENARIKAN, icon: '💸', label: 'Tarik' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],
 };

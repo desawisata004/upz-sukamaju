@@ -9,6 +9,7 @@ const LoginPage = lazy(() => import('./pages/login'));
 const HomePage = lazy(() => import('./pages/index'));
 const RTDashboard = lazy(() => import('./pages/rt/dashboard'));
 const RTSetoran = lazy(() => import('./pages/rt/setoran'));
+const RTPerarikan = lazy(() => import('./pages/rt/penarikan'));
 const AdminDashboard = lazy(() => import('./pages/admin/dashboard'));
 const AdminKelola = lazy(() => import('./pages/admin/kelola-kencleng'));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
@@ -52,6 +53,7 @@ const AppRoutes = () => (
       <Route path="/kencleng/:id" element={<ProtectedRoute><KenclengDetailPage /></ProtectedRoute>} />
       <Route path={ROUTES.RT_DASHBOARD} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTDashboard /></ProtectedRoute>} />
       <Route path={ROUTES.RT_SETORAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTSetoran /></ProtectedRoute>} />
+      <Route path={ROUTES.RT_PENARIKAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTPerarikan /></ProtectedRoute>} />
       <Route path={ROUTES.ADMIN_DASHBOARD} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
       <Route path={ROUTES.ADMIN_KELOLA} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminKelola /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />

@@ -8,6 +8,7 @@ import {
   getSetoranStats,
   getTrendBulanan,
   getKenclengWithStats,
+  getPendingPenarikan,
 } from '../../services/kenclengService';
 import { formatRupiah, formatTimeAgo } from '../../utils/formatter';
 import { SkeletonCard } from '../../components/common/Loading';
@@ -61,6 +62,7 @@ const RTDashboardPage = () => {
   const [kenclengList, setKenclengList] = useState([]);
   const [kenclengStats, setKenclengStats] = useState([]);
   const [pendingSetoran, setPendingSetoran] = useState([]);
+  const [pendingPenarikan, setPendingPenarikan] = useState([]);
   const [setoranStats, setSetoranStats] = useState(null);
   const [trendData, setTrendData] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,10 +74,10 @@ const RTDashboardPage = () => {
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
-      const [kl, ps, stats, ks] = await Promise.all([
-        getAllKencleng(), getPendingSetoran(), getSetoranStats(), getKenclengWithStats(),
+      const [kl, ps, stats, ks, pp] = await Promise.all([
+        getAllKencleng(), getPendingSetoran(), getSetoranStats(), getKenclengWithStats(), getPendingPenarikan(),
       ]);
-      setKenclengList(kl); setPendingSetoran(ps); setSetoranStats(stats); setKenclengStats(ks);
+      setKenclengList(kl); setPendingSetoran(ps); setSetoranStats(stats); setKenclengStats(ks); setPendingPenarikan(pp);
     } finally { setLoading(false); }
   }, []);
 
@@ -112,7 +114,19 @@ const RTDashboardPage = () => {
 
       <div className="page-content">
 
-        {/* Pending Alert */}
+        {/* Pending Alert Penarikan */}
+        {!loading && pendingPenarikan.length > 0 && (
+          <div onClick={() => navigate('/rt/penarikan')} style={{ background: 'linear-gradient(135deg, #fdeaea, #fff)', border: '1.5px solid #c0392b', borderRadius: 'var(--radius-lg)', padding: '14px 16px', marginBottom: 12, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', animation: 'fadeIn 0.3s ease' }}>
+            <div style={{ width: 40, height: 40, background: '#fdeaea', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>💸</div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: 700, color: '#c0392b', fontSize: '0.9rem' }}>{pendingPenarikan.length} Penarikan Menunggu Persetujuan</div>
+              <div style={{ fontSize: '0.78rem', color: 'var(--abu-500)' }}>Total: {formatRupiah(pendingPenarikan.reduce((a, p) => a + (p.nominal || 0), 0))} · Ketuk untuk tinjau</div>
+            </div>
+            <span style={{ color: '#c0392b', fontSize: '1.1rem' }}>→</span>
+          </div>
+        )}
+
+        {/* Pending Alert Setoran */}
         {!loading && pendingSetoran.length > 0 && (
           <div onClick={() => navigate('/rt/setoran')} style={{ background: 'linear-gradient(135deg, #fdeaea, #fff)', border: '1.5px solid var(--danger)', borderRadius: 'var(--radius-lg)', padding: '14px 16px', marginBottom: 16, display: 'flex', alignItems: 'center', gap: 12, cursor: 'pointer', animation: 'fadeIn 0.3s ease' }}>
             <div style={{ width: 40, height: 40, background: '#fdeaea', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.2rem', flexShrink: 0 }}>🔔</div>

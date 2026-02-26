@@ -43,3 +43,26 @@ export const notifyTargetTercapai = (userId, target) =>
     body: `Selamat! Kencleng Anda telah mencapai target Rp ${target.toLocaleString('id-ID')}.`,
     type: 'target_tercapai',
   });
+export const notifyPenarikanDiajukan = (rtUserId, namaPemilik, nominal) =>
+  sendNotification({
+    userId: rtUserId,
+    title: '💸 Pengajuan Penarikan Baru',
+    body: `${namaPemilik} mengajukan penarikan Rp ${nominal.toLocaleString('id-ID')}. Segera tinjau.`,
+    type: 'penarikan_diajukan',
+  });
+
+export const notifyPenarikanDisetujui = (userId, nominal) =>
+  sendNotification({
+    userId,
+    title: '✅ Penarikan Disetujui',
+    body: `Penarikan Rp ${nominal.toLocaleString('id-ID')} telah disetujui. Silakan ambil dananya.`,
+    type: 'penarikan_disetujui',
+  });
+
+export const notifyPenarikanDitolak = (userId, nominal, alasan) =>
+  sendNotification({
+    userId,
+    title: '❌ Penarikan Ditolak',
+    body: `Penarikan Rp ${nominal.toLocaleString('id-ID')} ditolak. ${alasan || ''}`,
+    type: 'penarikan_ditolak',
+  });
