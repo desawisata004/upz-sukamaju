@@ -55,3 +55,30 @@ export const getPengurusUsers = async () => {
     return [];
   }
 };
+import { doc, updateDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
+
+export const updateUser = async (uid, data) => {
+  if (!db) throw new Error('Firestore not initialized');
+  await updateDoc(doc(db, COLLECTIONS.USERS, uid), {
+    ...data,
+    updatedAt: serverTimestamp(),
+  });
+};
+
+export const deleteUser = async (uid) => {
+  if (!db) throw new Error('Firestore not initialized');
+  await deleteDoc(doc(db, COLLECTIONS.USERS, uid));
+};
+
+export const getUserById = async (uid) => {
+  if (!db) return null;
+  try {
+    const { doc: d, getDoc } = await import('firebase/firestore');
+    const snap = await getDoc(d(db, COLLECTIONS.USERS, uid));
+    if (!snap.exists()) return null;
+    return { uid: snap.id, ...snap.data() };
+  } catch (error) {
+    console.error('Error:', error);
+    return null;
+  }
+};

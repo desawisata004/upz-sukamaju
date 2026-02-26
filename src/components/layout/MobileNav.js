@@ -21,7 +21,7 @@ const navItems = {
   [ROLES.ADMIN]: [
     { path: ROUTES.ADMIN_DASHBOARD, icon: '📊', label: 'Dashboard' },
     { path: ROUTES.ADMIN_KELOLA, icon: '🪣', label: 'Kencleng' },
-    { path: ROUTES.RT_SETORAN, icon: '💰', label: 'Setoran' },
+    { path: '/admin/kelola-warga', icon: '👥', label: 'Warga' },
     { path: ROUTES.RT_PENARIKAN, icon: '💸', label: 'Tarik' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],

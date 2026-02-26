@@ -69,3 +69,43 @@ export const onAuthChange = (callback) => {
     return () => {};
   }
 };
+import {
+  createUserWithEmailAndPassword,
+} from 'firebase/auth';
+import { doc, setDoc, updateDoc, serverTimestamp } from 'firebase/firestore';
+
+export const registerUser = async ({ email, password, nama, noHp, alamat, role = 'warga' }) => {
+  if (!auth) throw new Error('Firebase Auth tidak tersedia');
+
+  try {
+    const result = await createUserWithEmailAndPassword(auth, email, password);
+    const uid = result.user.uid;
+
+    await setDoc(doc(db, 'users', uid), {
+      uid,
+      nama: nama.trim(),
+      email: email.toLowerCase().trim(),
+      noHp: noHp || '',
+      alamat: alamat || '',
+      role,
+      createdAt: serverTimestamp(),
+    });
+
+    return result.user;
+  } catch (error) {
+    if (error.code === 'auth/email-already-in-use') throw new Error('Email sudah terdaftar');
+    if (error.code === 'auth/weak-password') throw new Error('Password minimal 6 karakter');
+    if (error.code === 'auth/invalid-email') throw new Error('Format email tidak valid');
+    throw new Error('Gagal mendaftar: ' + error.message);
+  }
+};
+
+export const updateUserProfile = async (uid, { nama, noHp, alamat }) => {
+  if (!db) throw new Error('Firestore not initialized');
+  await updateDoc(doc(db, 'users', uid), {
+    nama: nama.trim(),
+    noHp: noHp || '',
+    alamat: alamat || '',
+    updatedAt: serverTimestamp(),
+  });
+};

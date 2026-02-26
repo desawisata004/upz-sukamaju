@@ -12,6 +12,7 @@ const RTSetoran = lazy(() => import('./pages/rt/setoran'));
 const RTPerarikan = lazy(() => import('./pages/rt/penarikan'));
 const AdminDashboard = lazy(() => import('./pages/admin/dashboard'));
 const AdminKelola = lazy(() => import('./pages/admin/kelola-kencleng'));
+const AdminKelolaWarga = lazy(() => import('./pages/admin/kelola-warga'));
 const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
 const ScanPage = lazy(() => import('./pages/ScanPage'));
 const RiwayatPage = lazy(() => import('./pages/RiwayatPage'));
@@ -56,6 +57,7 @@ const AppRoutes = () => (
       <Route path={ROUTES.RT_PENARIKAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTPerarikan /></ProtectedRoute>} />
       <Route path={ROUTES.ADMIN_DASHBOARD} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
       <Route path={ROUTES.ADMIN_KELOLA} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminKelola /></ProtectedRoute>} />
+      <Route path="/admin/kelola-warga" element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminKelolaWarga /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
     </Routes>
   </Suspense>
