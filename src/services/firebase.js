@@ -3,16 +3,20 @@ import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getMessaging, isSupported } from 'firebase/messaging';
 
-// Firebase configuration from environment variables
+// Firebase configuration - LANGSUNG DIISI (untuk test)
 const firebaseConfig = {
-  apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
-  authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.REACT_APP_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.REACT_APP_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.REACT_APP_FIREBASE_APP_ID,
-  measurementId: process.env.REACT_APP_FIREBASE_MEASUREMENT_ID
+  apiKey: "AIzaSyCKezmnqYrzPfO-MB2ur2x0aIdx8iYJWMM",
+  authDomain: "upz-sukamaju.firebaseapp.com",
+  projectId: "upz-sukamaju",
+  storageBucket: "upz-sukamaju.firebasestorage.app",
+  messagingSenderId: "511069915901",
+  appId: "1:511069915901:web:c8ec6af8961a75dd878c94"
 };
+
+console.log('🔥 Firebase Config:', {
+  ...firebaseConfig,
+  apiKey: firebaseConfig.apiKey ? '✅ ADA' : '❌ TIDAK ADA'
+});
 
 // Validasi konfigurasi
 const validateConfig = () => {
@@ -21,12 +25,6 @@ const validateConfig = () => {
   
   if (missingFields.length > 0) {
     console.error('❌ Firebase: Missing required config fields:', missingFields.join(', '));
-    return false;
-  }
-  
-  // Cek format apiKey (biasanya panjang)
-  if (firebaseConfig.apiKey.length < 20) {
-    console.error('❌ Firebase: API Key seems invalid');
     return false;
   }
   
@@ -44,18 +42,27 @@ let initializationError = null;
 if (typeof window !== 'undefined') {
   try {
     if (!validateConfig()) {
-      initializationError = new Error('Firebase configuration is invalid. Please check your environment variables.');
+      initializationError = new Error('Firebase configuration is invalid');
+      console.error('❌ Firebase validation failed');
     } else {
       console.log('🔥 Firebase config validated, initializing...');
       app = initializeApp(firebaseConfig);
+      console.log('✅ Firebase app initialized');
+      
       auth = getAuth(app);
+      console.log('✅ Firebase auth initialized');
+      
       db = getFirestore(app);
-      console.log('✅ Firebase initialized successfully');
+      console.log('✅ Firebase firestore initialized');
+      
+      console.log('🎉 Firebase fully initialized successfully');
     }
   } catch (error) {
     initializationError = error;
     console.error('❌ Firebase initialization error:', error);
   }
+} else {
+  console.log('⏸️ Skipping Firebase init on server');
 }
 
 export { auth, db, initializationError };
