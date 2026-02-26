@@ -69,30 +69,28 @@ const LoginPage = () => {
     }
   };
 
-  const handleDaftar = async (e) => {
-    e?.preventDefault();
-    if (!regNama.trim()) { setAlert({ type: 'error', message: 'Nama lengkap harus diisi.' }); return; }
-    if (!regEmail.trim()) { setAlert({ type: 'error', message: 'Email harus diisi.' }); return; }
-    if (regPassword.length < 6) { setAlert({ type: 'error', message: 'Password minimal 6 karakter.' }); return; }
-    if (regPassword !== regConfirm) { setAlert({ type: 'error', message: 'Konfirmasi password tidak cocok.' }); return; }
+// Update bagian role di register
+const handleDaftar = async (e) => {
+  // ... kode sebelumnya ...
+  await registerUser({
+    email: regEmail.trim(),
+    password: regPassword,
+    nama: regNama.trim(),
+    noHp: regNoHp.trim(),
+    alamat: regAlamat.trim(),
+    role: 'warga', // Default warga
+  });
+  // ... kode selanjutnya ...
+};
 
-    setLoading(true);
-    try {
-      await registerUser({
-        email: regEmail.trim(),
-        password: regPassword,
-        nama: regNama.trim(),
-        noHp: regNoHp.trim(),
-        alamat: regAlamat.trim(),
-        role: 'warga',
-      });
-      setAlert({ type: 'success', message: '✅ Akun berhasil dibuat! Anda akan masuk secara otomatis.' });
-    } catch (err) {
-      setAlert({ type: 'error', message: err.message });
-    } finally {
-      setLoading(false);
-    }
-  };
+// Update redirect setelah login
+React.useEffect(() => {
+  if (userData) {
+    if (userData.role === ROLES.ADMIN_DESA) navigate(ROUTES.ADMIN_DESA_DASHBOARD, { replace: true });
+    else if (userData.role === ROLES.RT) navigate(ROUTES.RT_DASHBOARD, { replace: true });
+    else navigate(ROUTES.WARGA_PORTAL, { replace: true });
+  }
+}, [userData, navigate]);
 
   return (
     <div className="app-layout" style={{ minHeight: '100vh', background: 'var(--coklat-pale)' }}>

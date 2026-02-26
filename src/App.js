@@ -5,19 +5,28 @@ import { LoadingPage } from './components/common/Loading';
 import { ROLES, ROUTES } from './config/constants';
 import './styles/globals.css';
 
-const LoginPage = lazy(() => import('./pages/login'));
-const HomePage = lazy(() => import('./pages/index'));
+// Warga Pages
+const WargaPortalPage = lazy(() => import('./pages/warga/PortalPage'));
+const WargaRiwayatPage = lazy(() => import('./pages/warga/RiwayatPage'));
+const WargaLaporanPage = lazy(() => import('./pages/warga/LaporanPage'));
+
+// RT Pages
 const RTDashboard = lazy(() => import('./pages/rt/dashboard'));
 const RTSetoran = lazy(() => import('./pages/rt/setoran'));
-const RTPerarikan = lazy(() => import('./pages/rt/penarikan'));
-const AdminDashboard = lazy(() => import('./pages/admin/dashboard'));
-const AdminKelola = lazy(() => import('./pages/admin/kelola-kencleng'));
-const AdminKelolaWarga = lazy(() => import('./pages/admin/kelola-warga'));
-const LeaderboardPage = lazy(() => import('./pages/LeaderboardPage'));
-const ScanPage = lazy(() => import('./pages/ScanPage'));
-const RiwayatPage = lazy(() => import('./pages/RiwayatPage'));
-const ProfilPage = lazy(() => import('./pages/ProfilPage'));
-const KenclengDetailPage = lazy(() => import('./pages/KenclengDetailPage'));
+const RTPenarikan = lazy(() => import('./pages/rt/penarikan'));
+const RTVerifikasi = lazy(() => import('./pages/rt/verifikasi'));
+
+// Admin Desa Pages
+const AdminDesaDashboard = lazy(() => import('./pages/admin-desa/dashboard'));
+const AdminDesaKelolaKencleng = lazy(() => import('./pages/admin-desa/kelola-kencleng'));
+const AdminDesaKelolaWarga = lazy(() => import('./pages/admin-desa/kelola-warga'));
+const AdminDesaKelolaRT = lazy(() => import('./pages/admin-desa/kelola-rt'));
+const AdminDesaImport = lazy(() => import('./pages/admin-desa/import'));
+const AdminDesaCetakQR = lazy(() => import('./pages/admin-desa/cetak-qr'));
+const AdminDesaLaporan = lazy(() => import('./pages/admin-desa/laporan'));
+
+// Auth Pages
+const LoginPage = lazy(() => import('./pages/login'));
 
 const ProtectedRoute = ({ children, roles }) => {
   const { user, userData, loading } = useAuth();
@@ -35,9 +44,9 @@ const PublicRoute = ({ children }) => {
   
   if (loading) return <LoadingPage />;
   if (user && userData) {
-    if (userData.role === ROLES.ADMIN) return <Navigate to={ROUTES.ADMIN_DASHBOARD} replace />;
+    if (userData.role === ROLES.ADMIN_DESA) return <Navigate to={ROUTES.ADMIN_DESA_DASHBOARD} replace />;
     if (userData.role === ROLES.RT) return <Navigate to={ROUTES.RT_DASHBOARD} replace />;
-    return <Navigate to={ROUTES.HOME} replace />;
+    return <Navigate to={ROUTES.WARGA_PORTAL} replace />;
   }
   return children;
 };
@@ -45,20 +54,32 @@ const PublicRoute = ({ children }) => {
 const AppRoutes = () => (
   <Suspense fallback={<LoadingPage />}>
     <Routes>
+      {/* Public Routes */}
       <Route path={ROUTES.LOGIN} element={<PublicRoute><LoginPage /></PublicRoute>} />
-      <Route path={ROUTES.HOME} element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-      <Route path="/scan" element={<ProtectedRoute><ScanPage /></ProtectedRoute>} />
-      <Route path="/riwayat" element={<ProtectedRoute><RiwayatPage /></ProtectedRoute>} />
-      <Route path="/leaderboard" element={<ProtectedRoute><LeaderboardPage /></ProtectedRoute>} />
-      <Route path="/profil" element={<ProtectedRoute><ProfilPage /></ProtectedRoute>} />
-      <Route path="/kencleng/:id" element={<ProtectedRoute><KenclengDetailPage /></ProtectedRoute>} />
-      <Route path={ROUTES.RT_DASHBOARD} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTDashboard /></ProtectedRoute>} />
-      <Route path={ROUTES.RT_SETORAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTSetoran /></ProtectedRoute>} />
-      <Route path={ROUTES.RT_PENARIKAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN]}><RTPerarikan /></ProtectedRoute>} />
-      <Route path={ROUTES.ADMIN_DASHBOARD} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminDashboard /></ProtectedRoute>} />
-      <Route path={ROUTES.ADMIN_KELOLA} element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminKelola /></ProtectedRoute>} />
-      <Route path="/admin/kelola-warga" element={<ProtectedRoute roles={[ROLES.ADMIN]}><AdminKelolaWarga /></ProtectedRoute>} />
-      <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+      
+      {/* Warga Routes */}
+      <Route path={ROUTES.WARGA_PORTAL} element={<ProtectedRoute><WargaPortalPage /></ProtectedRoute>} />
+      <Route path={ROUTES.WARGA_RIWAYAT} element={<ProtectedRoute><WargaRiwayatPage /></ProtectedRoute>} />
+      <Route path={ROUTES.WARGA_LAPORAN} element={<ProtectedRoute><WargaLaporanPage /></ProtectedRoute>} />
+      
+      {/* RT Routes */}
+      <Route path={ROUTES.RT_DASHBOARD} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN_DESA]}><RTDashboard /></ProtectedRoute>} />
+      <Route path={ROUTES.RT_SETORAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN_DESA]}><RTSetoran /></ProtectedRoute>} />
+      <Route path={ROUTES.RT_PENARIKAN} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN_DESA]}><RTPenarikan /></ProtectedRoute>} />
+      <Route path={ROUTES.RT_VERIFIKASI} element={<ProtectedRoute roles={[ROLES.RT, ROLES.ADMIN_DESA]}><RTVerifikasi /></ProtectedRoute>} />
+      
+      {/* Admin Desa Routes */}
+      <Route path={ROUTES.ADMIN_DESA_DASHBOARD} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaDashboard /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_KELOLA} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaKelolaKencleng /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_KELOLA_WARGA} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaKelolaWarga /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_KELOLA_RT} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaKelolaRT /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_IMPORT} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaImport /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_CETAK_QR} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaCetakQR /></ProtectedRoute>} />
+      <Route path={ROUTES.ADMIN_DESA_LAPORAN} element={<ProtectedRoute roles={[ROLES.ADMIN_DESA]}><AdminDesaLaporan /></ProtectedRoute>} />
+      
+      {/* Redirect root to appropriate page */}
+      <Route path="/" element={<Navigate to={ROUTES.WARGA_PORTAL} replace />} />
+      <Route path="*" element={<Navigate to={ROUTES.WARGA_PORTAL} replace />} />
     </Routes>
   </Suspense>
 );

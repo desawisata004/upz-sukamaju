@@ -5,25 +5,24 @@ import { ROLES, ROUTES } from '../../config/constants';
 
 const navItems = {
   [ROLES.WARGA]: [
-    { path: ROUTES.HOME, icon: '🏠', label: 'Beranda' },
-    { path: '/scan', icon: '📷', label: 'Scan' },
-    { path: '/riwayat', icon: '📋', label: 'Riwayat' },
-    { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
+    { path: ROUTES.WARGA_PORTAL, icon: '🏠', label: 'Portal' },
+    { path: ROUTES.WARGA_RIWAYAT, icon: '📋', label: 'Riwayat' },
+    { path: ROUTES.WARGA_LAPORAN, icon: '📊', label: 'Laporan' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],
   [ROLES.RT]: [
     { path: ROUTES.RT_DASHBOARD, icon: '📊', label: 'Dashboard' },
     { path: ROUTES.RT_SETORAN, icon: '💰', label: 'Setoran' },
+    { path: ROUTES.RT_VERIFIKASI, icon: '✅', label: 'Verifikasi' },
     { path: ROUTES.RT_PENARIKAN, icon: '💸', label: 'Tarik' },
-    { path: '/leaderboard', icon: '🏆', label: 'Peringkat' },
     { path: '/profil', icon: '👤', label: 'Profil' },
   ],
-  [ROLES.ADMIN]: [
-    { path: ROUTES.ADMIN_DASHBOARD, icon: '📊', label: 'Dashboard' },
-    { path: ROUTES.ADMIN_KELOLA, icon: '🪣', label: 'Kencleng' },
-    { path: '/admin/kelola-warga', icon: '👥', label: 'Warga' },
-    { path: ROUTES.RT_PENARIKAN, icon: '💸', label: 'Tarik' },
-    { path: '/profil', icon: '👤', label: 'Profil' },
+  [ROLES.ADMIN_DESA]: [
+    { path: ROUTES.ADMIN_DESA_DASHBOARD, icon: '📊', label: 'Dashboard' },
+    { path: ROUTES.ADMIN_DESA_KELOLA, icon: '🪣', label: 'Kencleng' },
+    { path: ROUTES.ADMIN_DESA_KELOLA_WARGA, icon: '👥', label: 'Warga' },
+    { path: ROUTES.ADMIN_DESA_KELOLA_RT, icon: '🏛️', label: 'RT' },
+    { path: ROUTES.ADMIN_DESA_LAPORAN, icon: '📈', label: 'Laporan' },
   ],
 };
 
@@ -44,16 +43,13 @@ const MobileNav = () => {
         bottom: 0,
         left: 0,
         right: 0,
-        width: '100%',
-        maxWidth: '100%',
-        margin: '0 auto',
         background: '#fff',
         borderTop: '1px solid var(--abu-100)',
         display: 'flex',
-        alignItems: 'stretch',
-        zIndex: 200,
-        boxShadow: '0 -4px 20px rgba(28,26,22,0.08)',
+        justifyContent: 'space-around',
+        padding: '8px 4px',
         paddingBottom: 'env(safe-area-inset-bottom)',
+        zIndex: 100,
       }}
     >
       {items.map((item) => {
@@ -63,55 +59,22 @@ const MobileNav = () => {
             key={item.path}
             onClick={() => navigate(item.path)}
             style={{
-              flex: 1,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              justifyContent: 'center',
-              gap: '2px',
-              padding: '8px 2px',
+              gap: 2,
               background: 'none',
               border: 'none',
               cursor: 'pointer',
               color: isActive ? 'var(--hijau)' : 'var(--abu-400)',
-              transition: 'all var(--transition)',
-              position: 'relative',
-              minWidth: 0,
+              fontSize: '0.7rem',
+              fontWeight: isActive ? 600 : 400,
+              padding: '4px 8px',
+              flex: 1,
             }}
           >
-            {isActive && (
-              <span
-                style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: '20%',
-                  right: '20%',
-                  height: 3,
-                  background: 'var(--hijau)',
-                  borderRadius: '0 0 3px 3px',
-                }}
-              />
-            )}
-            <span
-              style={{
-                fontSize: 'clamp(1.1rem, 5vw, 1.3rem)',
-                transform: isActive ? 'scale(1.1)' : 'scale(1)',
-              }}
-            >
-              {item.icon}
-            </span>
-            <span
-              style={{
-                fontSize: 'clamp(0.55rem, 2.5vw, 0.65rem)',
-                fontWeight: isActive ? 700 : 500,
-                whiteSpace: 'nowrap',
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                maxWidth: '100%',
-              }}
-            >
-              {item.label}
-            </span>
+            <span style={{ fontSize: '1.2rem' }}>{item.icon}</span>
+            <span>{item.label}</span>
           </button>
         );
       })}
