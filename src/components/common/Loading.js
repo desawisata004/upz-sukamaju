@@ -1,65 +1,22 @@
 import React from 'react';
 
-export const Spinner = ({ size = 32, color = 'var(--hijau)' }) => (
-  <div
-    style={{
-      width: size,
-      height: size,
-      border: `3px solid var(--abu-200)`,
-      borderTopColor: color,
-      borderRadius: '50%',
-      animation: 'spin 0.7s linear infinite',
-      flexShrink: 0,
-    }}
-  />
-);
-
-export const LoadingPage = ({ text = 'Memuat...' }) => (
-  <div
-    style={{
-      minHeight: '100vh',
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      gap: '16px',
-      background: 'var(--coklat-pale)',
-    }}
-  >
-    <div
-      style={{
-        width: 64,
-        height: 64,
-        background: 'var(--hijau)',
-        borderRadius: '20px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '2rem',
-        boxShadow: 'var(--shadow-lg)',
-      }}
-    >
-      🪣
+const Loading = ({ fullScreen = false, message = 'Memuat...' }) => {
+  const content = (
+    <div className="flex flex-col items-center justify-center">
+      <div className="w-12 h-12 border-4 border-green-200 border-t-green-600 rounded-full animate-spin" />
+      {message && <p className="mt-4 text-gray-600">{message}</p>}
     </div>
-    <Spinner size={36} />
-    <p style={{ color: 'var(--abu-500)', fontSize: '0.9rem' }}>{text}</p>
-  </div>
-);
+  );
 
-export const SkeletonCard = () => (
-  <div
-    style={{
-      background: '#fff',
-      borderRadius: 'var(--radius-lg)',
-      padding: '20px',
-      boxShadow: 'var(--shadow-sm)',
-    }}
-  >
-    <div className="skeleton" style={{ height: 20, width: '60%', marginBottom: 12 }} />
-    <div className="skeleton" style={{ height: 32, width: '40%', marginBottom: 12 }} />
-    <div className="skeleton" style={{ height: 8, width: '100%', borderRadius: 4 }} />
-  </div>
-);
+  if (fullScreen) {
+    return (
+      <div className="fixed inset-0 bg-white bg-opacity-90 z-50 flex items-center justify-center">
+        {content}
+      </div>
+    );
+  }
 
-const Loading = LoadingPage;
+  return content;
+};
+
 export default Loading;
